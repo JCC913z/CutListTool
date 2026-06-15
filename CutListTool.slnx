@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="CutListTool.Core/CutListTool.Core.csproj" />
+  <Project Path="CutListTool.TestApp/CutListTool.TestApp.csproj" />
+</Solution>
