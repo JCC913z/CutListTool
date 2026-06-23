@@ -7,7 +7,7 @@ public readonly record struct DuctmateFrame(
     string? Label = null
 ) : IBuildItem
 {
-    public CutItemType Type => CutItemType.Ductmate;
+    public BuildItemType Type => BuildItemType.Ductmate;
 
     public string GetBuildListText()
     {

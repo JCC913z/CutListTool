@@ -1,12 +1,12 @@
+using CutListTool.Core.Settings;
 using CutListTool.Core.Models;
 
 namespace CutListTool.Core.Generators;
 
 public class LinerGenerator
 {
-    private const decimal FourPieceWidthDeduction = 2m;
-    private const decimal FourPieceHeightDeduction = 0.5m;
-    private const decimal TwoPieceDeduction = 1.5m;
+    private readonly UserPreferences prefs;
+    public LinerGenerator(UserPreferences preferences) {this.prefs = preferences;}
 
     public List<LinearCutItem> Generate(Liner liner)
     {
@@ -26,14 +26,14 @@ public class LinerGenerator
         return new List<LinearCutItem>
         {
             new(
-                Length: liner.Width - FourPieceWidthDeduction,
+                Length: liner.Width - prefs.FourPieceWidthDeduction,
                 Qty: liner.Qty * 2,
                 Type: CutItemType.Liner,
                 GroupLabel: groupLabel
             ),
 
             new(
-                Length: liner.Height - FourPieceHeightDeduction,
+                Length: liner.Height - prefs.FourPieceHeightDeduction,
                 Qty: liner.Qty * 2,
                 Type: CutItemType.Liner,
                 GroupLabel: groupLabel
@@ -43,7 +43,7 @@ public class LinerGenerator
 
     private List<LinearCutItem> GenerateTwoPieceCuts(Liner liner, string groupLabel)
     {
-        decimal cutLength = liner.Width + liner.Height - TwoPieceDeduction;
+        decimal cutLength = liner.Width + liner.Height - prefs.TwoPieceDeduction;
 
         return new List<LinearCutItem>
         {

@@ -10,7 +10,7 @@ public readonly record struct Liner(
     string? Label = null
 ) : IBuildItem
 {
-    public CutItemType Type => CutItemType.Liner;
+    public BuildItemType Type => BuildItemType.Liner;
 
     public string GetBuildListText()
     {
