@@ -1,12 +1,13 @@
 ﻿using CutListTool.Core.Generators;
 using CutListTool.Core.Models;
 using CutListTool.Core.Services;
-
+using CutListTool.Core.Settings;
 
 //Initialization
+UserPreferences prefs = new();
 List<IBuildItem> buildItems = new();
-DuctmateGenerator dmGenerator = new();
-LinerGenerator linerGenerator = new();
+DuctmateGenerator dmGenerator = new(prefs);
+LinerGenerator linerGenerator = new(prefs);
 
 List<DuctmateFrame> dmFrames = new()
 {
@@ -70,20 +71,26 @@ foreach (Liner liner in liners)
 
 List<LinearCutItem> groupedCuts = CutListGrouper.GroupLinearCuts(rawCuts);
 
-List<CutItemType> cutTypes = groupedCuts.Select(cut => cut.Type).Distinct().OrderBy(type => type).ToList();
-
+List<BuildItemType> buildTypes = buildItems
+    .Select(item => item.BuildType)
+    .Union(groupedCuts.Select(cut => cut.BuildType))
+    .Distinct()
+    .OrderBy(type => type)
+    .ToList();
 
 //Output Processes
-foreach (CutItemType cutType in cutTypes)
+foreach (BuildItemType buildType in buildTypes)
 {
-    Console.WriteLine(cutType.ToString().ToUpper());
+    Console.WriteLine(buildType.ToString().ToUpper());
     Console.WriteLine("==========");
     Console.WriteLine();
 
     Console.WriteLine("Build List");
     Console.WriteLine("----------");
 
-    List<IBuildItem> matchingBuildItems = buildItems.Where(item => item.Type == cutType).ToList();
+    List<IBuildItem> matchingBuildItems = buildItems
+        .Where(item => item.BuildType == buildType)
+        .ToList();
 
     foreach (IBuildItem buildItem in matchingBuildItems)
     {
@@ -95,26 +102,52 @@ foreach (CutItemType cutType in cutTypes)
     Console.WriteLine("Cut List");
     Console.WriteLine("--------");
 
-    List<LinearCutItem> matchingCuts = groupedCuts.Where(cut => cut.Type == cutType).ToList();
-    
-    List<string?> groupLabels = matchingCuts.Select(cut => cut.GroupLabel).Distinct().OrderBy(groupLabel => groupLabel).ToList();
+    List<LinearCutItem> matchingCutsForBuildType = groupedCuts
+        .Where(cut => cut.BuildType == buildType)
+        .ToList();
 
-    foreach (string? groupLabel in groupLabels)
+    List<CutItemType> cutTypes = matchingCutsForBuildType
+        .Select(cut => cut.CutType)
+        .Distinct()
+        .OrderBy(cutType => cutType)
+        .ToList();
+
+    foreach (CutItemType cutType in cutTypes)
     {
-        if (!string.IsNullOrWhiteSpace(groupLabel))
-        {
-            Console.WriteLine();
-            Console.WriteLine(groupLabel);
-            Console.WriteLine("----------");
-        }
+        Console.WriteLine();
+        Console.WriteLine(cutType);
+        Console.WriteLine("----------");
 
-        List<LinearCutItem> cutsInGroup = matchingCuts.Where(cut => cut.GroupLabel == groupLabel).ToList();
+        List<LinearCutItem> matchingCutsForCutType = matchingCutsForBuildType
+            .Where(cut => cut.CutType == cutType)
+            .ToList();
 
-        foreach (LinearCutItem cutItem in cutsInGroup)
+        List<string?> groupLabels = matchingCutsForCutType
+            .Select(cut => cut.GroupLabel)
+            .Distinct()
+            .OrderBy(groupLabel => groupLabel)
+            .ToList();
+
+        foreach (string? groupLabel in groupLabels)
         {
-            Console.WriteLine($"{cutItem.Qty} @ {cutItem.Length}\"");
+            if (!string.IsNullOrWhiteSpace(groupLabel))
+            {
+                Console.WriteLine();
+                Console.WriteLine(groupLabel);
+                Console.WriteLine("----------");
+            }
+
+            List<LinearCutItem> cutsInGroup = matchingCutsForCutType
+                .Where(cut => cut.GroupLabel == groupLabel)
+                .ToList();
+
+            foreach (LinearCutItem cutItem in cutsInGroup)
+            {
+                Console.WriteLine($"{cutItem.Qty} @ {cutItem.Length}\"");
+            }
         }
     }
 
     Console.WriteLine();
 }
+

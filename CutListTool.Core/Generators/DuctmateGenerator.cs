@@ -15,13 +15,15 @@ public class DuctmateGenerator
             new(
                 Length: dmFrame.Width - prefs.DMCutAllowance,
                 Qty: dmFrame.Qty * 2,
-                Type: CutItemType.Ductmate
+                BuildType: BuildItemType.Ductmate,
+                CutType: CutItemType.Ductmate
             ),
 
             new(
                 Length: dmFrame.Height - prefs.DMCutAllowance,
                 Qty: dmFrame.Qty * 2,
-                Type: CutItemType.Ductmate
+                BuildType: BuildItemType.Ductmate,
+                CutType: CutItemType.Ductmate
             )
         };
     }

@@ -3,6 +3,7 @@ namespace CutListTool.Core.Models;
 public readonly record struct LinearCutItem(
     decimal Length,
     int Qty,
-    CutItemType Type,
+    BuildItemType BuildType,
+    CutItemType CutType,
     string? GroupLabel = null
 );

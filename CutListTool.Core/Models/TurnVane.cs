@@ -4,26 +4,28 @@ public readonly record struct TurnVane(
     decimal CheekA,
     decimal CheekB,
     decimal Heel,    
+    LinerThickness Liner,
     int Qty,
     string? Label = null
 ): IBuildItem
 {
-    public BuildItemType Type => BuildItemType.TurnVane;
+    public BuildItemType BuildType => BuildItemType.TurnVane;
 
     public TurnVane(
         decimal cheekA,
         decimal heel,
+        LinerThickness liner,
         int qty,
         string? label = null
     ) : this(
         CheekA : cheekA,
         CheekB: cheekA,
+        Liner : liner,
         Heel: heel,
         Qty: qty,
         Label: label
     )
-    {
-        
+    {        
     }
 
     public string GetBuildListText()

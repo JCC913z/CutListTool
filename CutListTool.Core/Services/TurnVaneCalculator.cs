@@ -4,21 +4,30 @@ using CutListTool.Core.Models;
 namespace CutListTool.Core.Services;
 
 public static class TurnVaneCalculator
-{
-    
-    public static CalculatedTV Calculate(TurnVane TV, decimal DiagDeduction, decimal VaneSpacing)
+{    
+    public static CalculatedTV Calculate(TurnVane TV, decimal DiagDeduction, decimal VaneSpacing, decimal SplitterGap, int SplitVanes = 1)
     {
-        int count = 0;
-        decimal length = 0m;
+        int count;
+        decimal length;
+        int qtyPerElbow;
         
-        //formula
-        decimal diag = (decimal)Vector2.Distance(new(0.0f, 0.0f), new((float)TV.CheekA, (float)TV.CheekB));
-        diag -= DiagDeduction;
+        decimal diag = (decimal)Math.Sqrt((double)(TV.CheekA*TV.CheekA + TV.CheekB*TV.CheekB));
+
+        diag -= DiagDeduction + 2 * TV.Liner.ToDecimalThickness();
+        count = (int)decimal.Floor(diag / VaneSpacing) + 1;
+
+        length = TV.Heel - 0.25m - (TV.Liner.ToDecimalThickness() / 2m);
         
+        length -= (SplitVanes - 1) * SplitterGap;
+
+        length /= SplitVanes;
         
+        qtyPerElbow = SplitVanes;
+
         return new CalculatedTV(
             Count: count,
-            Length: length
+            Length: length,
+            QtyPerElbow: qtyPerElbow
         );        
     }
 }

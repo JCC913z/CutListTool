@@ -8,15 +8,17 @@ public static class CutListGrouper
     {
         List<LinearCutItem> groupedCuts = rawCuts.GroupBy(cut => new
         {
-            cut.Type,
+            cut.BuildType,
+            cut.CutType,
             cut.GroupLabel,
             cut.Length
         }).Select(group => new LinearCutItem(
             Length: group.Key.Length,
             Qty: group.Sum(cut => cut.Qty),
-            Type: group.Key.Type,
+            BuildType: group.Key.BuildType,
+            CutType: group.Key.CutType,
             GroupLabel: group.Key.GroupLabel
-        )).OrderBy(cut => cut.Type).ThenBy(cut => cut.GroupLabel).ThenByDescending(cut => cut.Length).ToList();
+        )).OrderBy(cut => cut.BuildType).ThenBy(cut => cut.CutType).ThenBy(cut => cut.GroupLabel).ThenByDescending(cut => cut.Length).ToList();
 
         return groupedCuts;
     }

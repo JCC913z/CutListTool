@@ -13,6 +13,7 @@ public sealed record UserPreferences
     //TurnVane
     public decimal DiagonalDeduction {get; init;} = 2m;
     public decimal VaneSpacing {get; init;} = 4.75m;
+    public decimal SplitterGap {get; init;} = 0.125m;    
 
     //Flex
 

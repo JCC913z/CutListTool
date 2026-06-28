@@ -2,7 +2,7 @@ namespace CutListTool.Core.Models;
 
 public interface IBuildItem
 {
-    BuildItemType Type { get; }
+    BuildItemType BuildType { get; }
 
     string GetBuildListText();
 }

@@ -28,14 +28,16 @@ public class LinerGenerator
             new(
                 Length: liner.Width - prefs.FourPieceWidthDeduction,
                 Qty: liner.Qty * 2,
-                Type: CutItemType.Liner,
+                BuildType: BuildItemType.Liner,
+                CutType: CutItemType.Liner,
                 GroupLabel: groupLabel
             ),
 
             new(
                 Length: liner.Height - prefs.FourPieceHeightDeduction,
                 Qty: liner.Qty * 2,
-                Type: CutItemType.Liner,
+                BuildType: BuildItemType.Liner,
+                CutType: CutItemType.Liner,
                 GroupLabel: groupLabel
             )
         };
@@ -50,7 +52,8 @@ public class LinerGenerator
             new(
                 Length: cutLength,
                 Qty: liner.Qty * 2,
-                Type: CutItemType.Liner,
+                BuildType: BuildItemType.Liner,
+                CutType: CutItemType.Liner,
                 GroupLabel: groupLabel
             )
         };
