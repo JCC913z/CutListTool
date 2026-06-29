@@ -5,9 +5,14 @@ using CutListTool.Core.Settings;
 
 //Initialization
 UserPreferences prefs = new();
-List<IBuildItem> buildItems = new();
+
+List<BuildListLine> buildLines = new();
+List<LinearCutItem> rawLinearCuts = new();
+List<CountCutItem> rawCountCuts = new();
+
 DuctmateGenerator dmGenerator = new(prefs);
 LinerGenerator linerGenerator = new(prefs);
+TurnVaneGenerator turnVaneGenerator = new(prefs);
 
 List<DuctmateFrame> dmFrames = new()
 {
@@ -49,34 +54,72 @@ List<Liner> liners = new()
     )
 };
 
-List<LinearCutItem> rawCuts = new();
+List<TurnVane> turnVanes = new()
+{
+    new(
+        CheekA: 24,
+        CheekB: 18,
+        Heel: 12,
+        Liner: LinerThickness.None,
+        Qty: 1,
+        Label: "AHU-1"
+    ),
+
+    new(
+        CheekA: 36,
+        CheekB: 24,
+        Heel: 16,
+        Liner: LinerThickness.One_Inch,
+        Qty: 2,
+        Label: "RTU-1"
+    ),
+
+    new(36, 36, 48, LinerThickness.One_Inch, 3, "#15", 2)
+};
+
 
 
 //Gather and Sort Data
 foreach (DuctmateFrame dmFrame in dmFrames)
 {
-    buildItems.Add(dmFrame);
+    GeneratedBuildOutput output = dmGenerator.Generate(dmFrame);
 
-    List<LinearCutItem> frameCuts = dmGenerator.Generate(dmFrame);
-    rawCuts.AddRange(frameCuts);
+    buildLines.Add(output.BuildLine);
+    rawLinearCuts.AddRange(output.LinearCuts);
+    rawCountCuts.AddRange(output.CountCuts);
 }
 
 foreach (Liner liner in liners)
 {
-    buildItems.Add(liner);
+    GeneratedBuildOutput output = linerGenerator.Generate(liner);
 
-    List<LinearCutItem> linerCuts = linerGenerator.Generate(liner);
-    rawCuts.AddRange(linerCuts);
+    buildLines.Add(output.BuildLine);
+    rawLinearCuts.AddRange(output.LinearCuts);
+    rawCountCuts.AddRange(output.CountCuts);
 }
 
-List<LinearCutItem> groupedCuts = CutListGrouper.GroupLinearCuts(rawCuts);
+foreach (TurnVane turnVane in turnVanes)
+{
+    GeneratedBuildOutput output = turnVaneGenerator.Generate(turnVane);
 
-List<BuildItemType> buildTypes = buildItems
-    .Select(item => item.BuildType)
-    .Union(groupedCuts.Select(cut => cut.BuildType))
+    buildLines.Add(output.BuildLine);
+    rawLinearCuts.AddRange(output.LinearCuts);
+    rawCountCuts.AddRange(output.CountCuts);
+}
+
+List<LinearCutItem> groupedLinearCuts = CutListGrouper.GroupLinearCuts(rawLinearCuts);
+List<CountCutItem> groupedCountCuts = CutListGrouper.GroupCountCuts(rawCountCuts);
+
+List<BuildItemType> buildTypes = buildLines
+    .Select(line => line.BuildType)
+    .Union(groupedLinearCuts.Select(cut => cut.BuildType))
+    .Union(groupedCountCuts.Select(cut => cut.BuildType))
     .Distinct()
     .OrderBy(type => type)
-    .ToList();
+    .ToList()
+;
+
+
 
 //Output Processes
 foreach (BuildItemType buildType in buildTypes)
@@ -88,13 +131,14 @@ foreach (BuildItemType buildType in buildTypes)
     Console.WriteLine("Build List");
     Console.WriteLine("----------");
 
-    List<IBuildItem> matchingBuildItems = buildItems
-        .Where(item => item.BuildType == buildType)
-        .ToList();
+    List<BuildListLine> matchingBuildLines = buildLines
+        .Where(line => line.BuildType == buildType)
+        .ToList()
+    ;
 
-    foreach (IBuildItem buildItem in matchingBuildItems)
+    foreach (BuildListLine buildLine in matchingBuildLines)
     {
-        Console.WriteLine(buildItem.GetBuildListText());
+        Console.WriteLine(buildLine.Text);
     }
 
     Console.WriteLine();
@@ -102,15 +146,23 @@ foreach (BuildItemType buildType in buildTypes)
     Console.WriteLine("Cut List");
     Console.WriteLine("--------");
 
-    List<LinearCutItem> matchingCutsForBuildType = groupedCuts
+    List<LinearCutItem> matchingLinearCuts = groupedLinearCuts
         .Where(cut => cut.BuildType == buildType)
-        .ToList();
+        .ToList()
+    ;
 
-    List<CutItemType> cutTypes = matchingCutsForBuildType
+    List<CountCutItem> matchingCountCuts = groupedCountCuts
+        .Where(cut => cut.BuildType == buildType)
+        .ToList()
+    ;
+
+    List<CutItemType> cutTypes = matchingLinearCuts
         .Select(cut => cut.CutType)
+        .Union(matchingCountCuts.Select(cut => cut.CutType))
         .Distinct()
         .OrderBy(cutType => cutType)
-        .ToList();
+        .ToList()
+    ;
 
     foreach (CutItemType cutType in cutTypes)
     {
@@ -118,12 +170,19 @@ foreach (BuildItemType buildType in buildTypes)
         Console.WriteLine(cutType);
         Console.WriteLine("----------");
 
-        List<LinearCutItem> matchingCutsForCutType = matchingCutsForBuildType
+        List<LinearCutItem> linearCutsForCutType = matchingLinearCuts
             .Where(cut => cut.CutType == cutType)
-            .ToList();
+            .ToList()
+        ;
 
-        List<string?> groupLabels = matchingCutsForCutType
+        List<CountCutItem> countCutsForCutType = matchingCountCuts
+            .Where(cut => cut.CutType == cutType)
+            .ToList()
+        ;
+
+        List<string?> groupLabels = linearCutsForCutType
             .Select(cut => cut.GroupLabel)
+            .Union(countCutsForCutType.Select(cut => cut.GroupLabel))
             .Distinct()
             .OrderBy(groupLabel => groupLabel)
             .ToList();
@@ -137,17 +196,32 @@ foreach (BuildItemType buildType in buildTypes)
                 Console.WriteLine("----------");
             }
 
-            List<LinearCutItem> cutsInGroup = matchingCutsForCutType
+            List<LinearCutItem> linearCutsInGroup = linearCutsForCutType
                 .Where(cut => cut.GroupLabel == groupLabel)
                 .ToList();
 
-            foreach (LinearCutItem cutItem in cutsInGroup)
+            foreach (LinearCutItem cutItem in linearCutsInGroup)
             {
                 Console.WriteLine($"{cutItem.Qty} @ {cutItem.Length}\"");
             }
+
+            List<CountCutItem> countCutsInGroup = countCutsForCutType
+                .Where(cut => cut.GroupLabel == groupLabel)
+                .ToList();
+
+            foreach (CountCutItem cutItem in countCutsInGroup)
+            {
+                if (cutItem.CutType == CutItemType.TV_Rails)
+                {
+                    Console.WriteLine($"{cutItem.Qty} @ {cutItem.CountSize}-vane rail");
+                }
+                else
+                {
+                    Console.WriteLine($"{cutItem.Qty} @ {cutItem.CountSize}");
+                }
+            }
         }
     }
-
     Console.WriteLine();
 }
 

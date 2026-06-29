@@ -18,7 +18,38 @@ public static class CutListGrouper
             BuildType: group.Key.BuildType,
             CutType: group.Key.CutType,
             GroupLabel: group.Key.GroupLabel
-        )).OrderBy(cut => cut.BuildType).ThenBy(cut => cut.CutType).ThenBy(cut => cut.GroupLabel).ThenByDescending(cut => cut.Length).ToList();
+        ))
+        .OrderBy(cut => cut.BuildType)
+        .ThenBy(cut => cut.CutType)
+        .ThenBy(cut => cut.GroupLabel)
+        .ThenByDescending(cut => cut.Length)
+        .ToList();
+
+        return groupedCuts;
+    }
+
+    public static List<CountCutItem> GroupCountCuts(List<CountCutItem> rawCuts)
+    {
+        List<CountCutItem> groupedCuts = rawCuts
+            .GroupBy(cut => new
+            {
+                cut.BuildType,
+                cut.CutType,
+                cut.GroupLabel,
+                cut.CountSize
+            })
+            .Select(group => new CountCutItem(
+                CountSize: group.Key.CountSize,
+                Qty: group.Sum(cut => cut.Qty),
+                BuildType: group.Key.BuildType,
+                CutType: group.Key.CutType,
+                GroupLabel: group.Key.GroupLabel
+            ))
+            .OrderBy(cut => cut.BuildType)
+            .ThenBy(cut => cut.CutType)
+            .ThenBy(cut => cut.GroupLabel)
+            .ThenByDescending(cut => cut.CountSize)
+            .ToList();
 
         return groupedCuts;
     }

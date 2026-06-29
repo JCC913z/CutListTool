@@ -11,12 +11,4 @@ public readonly record struct Liner(
 ) : IBuildItem
 {
     public BuildItemType BuildType => BuildItemType.Liner;
-
-    public string GetBuildListText()
-    {
-        string labelText = string.IsNullOrWhiteSpace(Label) ? "" : $" - {Label}";
-
-        return $"{Qty}x) {Width}\" x {Height}\" - {Thickness.ToDisplayText()} Liner - {(int)RollLength}\" Roll - {PieceMode}{labelText}";
-    }
-
 }

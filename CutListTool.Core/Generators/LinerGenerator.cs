@@ -8,17 +8,33 @@ public class LinerGenerator
     private readonly UserPreferences prefs;
     public LinerGenerator(UserPreferences preferences) {this.prefs = preferences;}
 
-    public List<LinearCutItem> Generate(Liner liner)
+    public GeneratedBuildOutput Generate(Liner liner)
     {
         string groupLabel = GetGroupLabel(liner);
 
-        if(liner.PieceMode == LinerPieceMode.FourPiece)
+        BuildListLine buildLine = new(
+            BuildType: BuildItemType.Liner,
+            Text: GetBuildListText(liner)
+        );
+
+        List<LinearCutItem> linearCuts;
+
+        if (liner.PieceMode == LinerPieceMode.FourPiece)
         {
-            return GenerateFourPieceCuts(liner, groupLabel);
+            linearCuts = GenerateFourPieceCuts(liner, groupLabel);
+        }
+        else
+        {
+            linearCuts = GenerateTwoPieceCuts(liner, groupLabel);
         }
 
-        return GenerateTwoPieceCuts(liner, groupLabel);
+        List<CountCutItem> countCuts = new();
 
+        return new GeneratedBuildOutput(
+            BuildLine: buildLine,
+            LinearCuts: linearCuts,
+            CountCuts: countCuts
+        );
     }
 
     private List<LinearCutItem> GenerateFourPieceCuts(Liner liner, string groupLabel)
@@ -58,6 +74,16 @@ public class LinerGenerator
             )
         };
     }
+
+    private string GetBuildListText(Liner liner)
+    {
+        string labelText = string.IsNullOrWhiteSpace(liner.Label)
+            ? ""
+            : $" - {liner.Label}";
+
+        return $"{liner.Qty}x) {liner.Width}\" x {liner.Height}\" - {liner.Thickness.ToDisplayText()} Liner - {(int)liner.RollLength}\" Roll - {liner.PieceMode}{labelText}";
+    }
+
     private string GetGroupLabel(Liner liner)
     {
         return $"{liner.Thickness.ToDisplayText()} Liner - {(int)liner.RollLength}\" Roll";

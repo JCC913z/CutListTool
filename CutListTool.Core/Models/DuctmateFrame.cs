@@ -8,11 +8,4 @@ public readonly record struct DuctmateFrame(
 ) : IBuildItem
 {
     public BuildItemType BuildType => BuildItemType.Ductmate;
-
-    public string GetBuildListText()
-    {
-        string labelText = string.IsNullOrWhiteSpace(Label) ? "" : $" - {Label}";
-
-        return $"{Qty}x) {Width}\" x {Height}\"{labelText}";
-    }
 }

@@ -8,9 +8,14 @@ public class DuctmateGenerator
     private readonly UserPreferences prefs;
     public DuctmateGenerator(UserPreferences preferences) {this.prefs = preferences;}
 
-    public List<LinearCutItem> Generate(DuctmateFrame dmFrame)
+    public GeneratedBuildOutput Generate(DuctmateFrame dmFrame)
     {
-        return new List<LinearCutItem>
+        BuildListLine buildLine = new(
+            BuildType: BuildItemType.Ductmate,
+            Text: GetBuildListText(dmFrame)
+        );
+
+        List<LinearCutItem> linearCuts = new()
         {
             new(
                 Length: dmFrame.Width - prefs.DMCutAllowance,
@@ -26,5 +31,22 @@ public class DuctmateGenerator
                 CutType: CutItemType.Ductmate
             )
         };
+
+        List<CountCutItem> countCuts = new();
+
+        return new GeneratedBuildOutput(
+            BuildLine: buildLine,
+            LinearCuts: linearCuts,
+            CountCuts: countCuts
+        );
+    }
+
+    private string GetBuildListText(DuctmateFrame dmFrame)
+    {
+        string labelText = string.IsNullOrWhiteSpace(dmFrame.Label)
+            ? ""
+            : $" - {dmFrame.Label}";
+
+        return $"{dmFrame.Qty}x) {dmFrame.Width}\" x {dmFrame.Height}\"{labelText}";
     }
 }

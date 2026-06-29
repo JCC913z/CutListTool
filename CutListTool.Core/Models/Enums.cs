@@ -31,7 +31,7 @@ public static class LinerThicknessExtensions
     public static string ToDisplayText(this LinerThickness thickness)
     {
         return thickness switch
-        {   LinerThickness.None => "",
+        {   LinerThickness.None => "No",
             LinerThickness.Half_Inch => "1/2\"",
             LinerThickness.One_Inch => "1\"",
             LinerThickness.OneAndHalf_Inch => "1-1/2\"",

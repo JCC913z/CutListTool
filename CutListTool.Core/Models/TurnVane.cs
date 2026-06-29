@@ -6,7 +6,8 @@ public readonly record struct TurnVane(
     decimal Heel,    
     LinerThickness Liner,
     int Qty,
-    string? Label = null
+    string? Label = null,
+    int SplitVanes = 1
 ): IBuildItem
 {
     public BuildItemType BuildType => BuildItemType.TurnVane;
@@ -25,13 +26,5 @@ public readonly record struct TurnVane(
         Qty: qty,
         Label: label
     )
-    {        
-    }
-
-    public string GetBuildListText()
-    {
-        string labelText = string.IsNullOrWhiteSpace(Label) ? "" : Label;
-
-        return $"{Label} - ";
-    }
+    { }
 }

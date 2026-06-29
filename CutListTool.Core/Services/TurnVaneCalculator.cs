@@ -5,7 +5,7 @@ namespace CutListTool.Core.Services;
 
 public static class TurnVaneCalculator
 {    
-    public static CalculatedTV Calculate(TurnVane TV, decimal DiagDeduction, decimal VaneSpacing, decimal SplitterGap, int SplitVanes = 1)
+    public static CalculatedTV Calculate(TurnVane TV, decimal DiagDeduction, decimal VaneSpacing, decimal SplitterGap)
     {
         int count;
         decimal length;
@@ -18,11 +18,11 @@ public static class TurnVaneCalculator
 
         length = TV.Heel - 0.25m - (TV.Liner.ToDecimalThickness() / 2m);
         
-        length -= (SplitVanes - 1) * SplitterGap;
+        length -= (TV.SplitVanes - 1) * SplitterGap;
 
-        length /= SplitVanes;
+        length /= TV.SplitVanes;
         
-        qtyPerElbow = SplitVanes;
+        qtyPerElbow = TV.SplitVanes;
 
         return new CalculatedTV(
             Count: count,
