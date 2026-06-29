@@ -4,11 +4,11 @@ using CutListTool.Core.Services;
 using CutListTool.Core.Settings;
 
 //Testing Area
-bool testing = false;
+bool testing = true;
 if (testing)
 {
     //Write Test Here and set bool to true, set back to false when done
-    Console.WriteLine(MathJC.RoundToSixteenth(23.75m));    
+    Console.WriteLine(MathJC.RoundToSixteenth(23.99m));    
 
     //End Test Area
     return;

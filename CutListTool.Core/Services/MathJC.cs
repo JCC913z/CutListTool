@@ -16,8 +16,10 @@ public static class MathJC
             d /= 2;
         }
 
-        string result = $"{i}";
+        string result = i.ToString();
         if(n > 0) { result += $"-{n}/{d}"; }
+
+        if(d == 1) { result = (i + 1).ToString(); }
 
         return result;
     }
