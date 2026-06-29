@@ -3,6 +3,17 @@ using CutListTool.Core.Models;
 using CutListTool.Core.Services;
 using CutListTool.Core.Settings;
 
+//Testing Area
+bool testing = false;
+if (testing)
+{
+    //Write Test Here and set bool to true, set back to false when done
+    Console.WriteLine(MathJC.RoundToSixteenth(23.75m));    
+
+    //End Test Area
+    return;
+}
+
 //Initialization
 UserPreferences prefs = new();
 
@@ -202,7 +213,9 @@ foreach (BuildItemType buildType in buildTypes)
 
             foreach (LinearCutItem cutItem in linearCutsInGroup)
             {
-                Console.WriteLine($"{cutItem.Qty} @ {cutItem.Length}\"");
+                string displayLength = cutItem.Length.ToString();
+                if (cutItem.DisplayInSixteenths) { displayLength = MathJC.RoundToSixteenth(cutItem.Length); }
+                Console.WriteLine($"{cutItem.Qty} @ {displayLength}\"");
             }
 
             List<CountCutItem> countCutsInGroup = countCutsForCutType

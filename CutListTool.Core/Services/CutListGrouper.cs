@@ -10,6 +10,7 @@ public static class CutListGrouper
         {
             cut.BuildType,
             cut.CutType,
+            cut.DisplayInSixteenths,
             cut.GroupLabel,
             cut.Length
         }).Select(group => new LinearCutItem(
@@ -17,6 +18,7 @@ public static class CutListGrouper
             Qty: group.Sum(cut => cut.Qty),
             BuildType: group.Key.BuildType,
             CutType: group.Key.CutType,
+            DisplayInSixteenths: group.Key.DisplayInSixteenths,
             GroupLabel: group.Key.GroupLabel
         ))
         .OrderBy(cut => cut.BuildType)

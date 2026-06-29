@@ -5,5 +5,6 @@ public readonly record struct LinearCutItem(
     int Qty,
     BuildItemType BuildType,
     CutItemType CutType,
+    bool DisplayInSixteenths = true,
     string? GroupLabel = null
 );

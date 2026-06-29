@@ -1,4 +1,5 @@
 using CutListTool.Core.Models;
+using CutListTool.Core.Services;
 using CutListTool.Core.Settings;
 
 namespace CutListTool.Core.Generators;
@@ -47,6 +48,6 @@ public class DuctmateGenerator
             ? ""
             : $" - {dmFrame.Label}";
 
-        return $"{dmFrame.Qty}x) {dmFrame.Width}\" x {dmFrame.Height}\"{labelText}";
+        return $"{dmFrame.Qty}x) {MathJC.RoundToSixteenth(dmFrame.Width)}\" x {MathJC.RoundToSixteenth(dmFrame.Height)}\"{labelText}";
     }
 }

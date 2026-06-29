@@ -38,7 +38,8 @@ public class TurnVaneGenerator
                 Length: calculated.Length,
                 Qty: turnVane.Qty * calculated.Count * calculated.QtyPerElbow,
                 BuildType: BuildItemType.TurnVane,
-                CutType: CutItemType.TV_Vanes
+                CutType: CutItemType.TV_Vanes,
+                DisplayInSixteenths: false
             )
         };
 
@@ -75,14 +76,14 @@ public class TurnVaneGenerator
 
         if (turnVane.CheekA == turnVane.CheekB)
         {
-            cheekText = $"{turnVane.CheekA}\" Cheeks";
+            cheekText = $"{MathJC.RoundToSixteenth(turnVane.CheekA)}\" Cheeks";
         }
         else
         {
-            cheekText = $"{turnVane.CheekA}\" x {turnVane.CheekB}\" Cheeks";
+            cheekText = $"{MathJC.RoundToSixteenth(turnVane.CheekA)}\" x {MathJC.RoundToSixteenth(turnVane.CheekB)}\" Cheeks";
         }
 
-        return $"{labelText} - {turnVane.Qty}x) {calculated.Count} @ {calculated.Length}\"{splitText} - [{cheekText} - {turnVane.Heel}\" Heel - {linerText}]";
+        return $"{labelText} - {turnVane.Qty}x) {calculated.Count} @ {MathJC.RoundToSixteenth(calculated.Length)}\"{splitText} - [{cheekText} - {MathJC.RoundToSixteenth(turnVane.Heel)}\" Heel - {linerText}]";
     }
 
 }

@@ -1,5 +1,6 @@
 using CutListTool.Core.Settings;
 using CutListTool.Core.Models;
+using CutListTool.Core.Services;
 
 namespace CutListTool.Core.Generators;
 
@@ -81,7 +82,7 @@ public class LinerGenerator
             ? ""
             : $" - {liner.Label}";
 
-        return $"{liner.Qty}x) {liner.Width}\" x {liner.Height}\" - {liner.Thickness.ToDisplayText()} Liner - {(int)liner.RollLength}\" Roll - {liner.PieceMode}{labelText}";
+        return $"{liner.Qty}x) {MathJC.RoundToSixteenth(liner.Width)}\" x {MathJC.RoundToSixteenth(liner.Height)}\" - {liner.Thickness.ToDisplayText()} Liner - {(int)liner.RollLength}\" Roll - {liner.PieceMode}{labelText}";
     }
 
     private string GetGroupLabel(Liner liner)
