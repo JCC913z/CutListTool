@@ -9,6 +9,7 @@ public static class MathJC
         decimal r = number - i;
 
         int n = (int)Math.Round(r*16);
+        if (n == 16) { i++; n = 0; }        
 
         while (n > 0 && n % 2 == 0)
         {
@@ -18,9 +19,7 @@ public static class MathJC
 
         string result = i.ToString();
         if(n > 0) { result += $"-{n}/{d}"; }
-
-        if(d == 1) { result = (i + 1).ToString(); }
-
+        
         return result;
     }
 
