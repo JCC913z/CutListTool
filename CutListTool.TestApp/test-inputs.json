@@ -1,0 +1,82 @@
+{
+  "ductmateFrames": [
+    {
+      "width": 24,
+      "height": 12,
+      "qty": 1,
+      "label": "AHU-1"
+    },
+    {
+      "width": 36,
+      "height": 12,
+      "qty": 1,
+      "label": "AHU-2"
+    },
+    {
+      "width": 24,
+      "height": 12,
+      "qty": 2,
+      "label": "RTU-1"
+    }
+  ],
+
+  "liners": [
+    {
+      "width": 48,
+      "height": 36,
+      "qty": 1,
+      "rollLength": "Roll59",
+      "thickness": "One_Inch",
+      "pieceMode": "FourPiece",
+      "label": "AHU-1"
+    },
+    {
+      "width": 24,
+      "height": 12,
+      "qty": 1,
+      "rollLength": "Roll56",
+      "thickness": "One_Inch",
+      "pieceMode": "TwoPiece",
+      "label": "AHU-2"
+    },
+    {
+      "width": 48,
+      "height": 36,
+      "qty": 1,
+      "rollLength": "Roll59",
+      "thickness": "OneAndHalf_Inch",
+      "pieceMode": "FourPiece",
+      "label": "RTU-1"
+    }
+  ],
+
+  "turnVanes": [
+    {
+      "cheekA": 24,
+      "cheekB": 18,
+      "heel": 12,
+      "liner": "None",
+      "qty": 1,
+      "label": "AHU-1",
+      "splitVanes": 1
+    },
+    {
+      "cheekA": 36,
+      "cheekB": 24,
+      "heel": 16,
+      "liner": "One_Inch",
+      "qty": 2,
+      "label": "RTU-1",
+      "splitVanes": 1
+    },
+    {
+      "cheekA": 36,
+      "cheekB": 36,
+      "heel": 48,
+      "liner": "One_Inch",
+      "qty": 3,
+      "label": "#15",
+      "splitVanes": 2
+    }
+  ]
+}

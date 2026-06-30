@@ -2,9 +2,11 @@
 using CutListTool.Core.Models;
 using CutListTool.Core.Services;
 using CutListTool.Core.Settings;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 //Testing Area
-bool testing = true;
+bool testing = false;
 if (testing)
 {
     //Write Test Here and set bool to true, set back to false when done
@@ -25,73 +27,23 @@ DuctmateGenerator dmGenerator = new(prefs);
 LinerGenerator linerGenerator = new(prefs);
 TurnVaneGenerator turnVaneGenerator = new(prefs);
 
-List<DuctmateFrame> dmFrames = new()
+JsonSerializerOptions jsonOptions = new()
 {
-    new(Width: 24, Height: 12, Qty: 1, Label: "AHU-1"),
-    new(Width: 36, Height: 12, Qty: 1, Label: "AHU-2"),
-    new(Width: 24, Height: 12, Qty: 2, Label: "RTU-1")
+    PropertyNameCaseInsensitive = true,
+    ReadCommentHandling = JsonCommentHandling.Skip,
+    AllowTrailingCommas = true
 };
 
-List<Liner> liners = new()
-{
-    new(
-        Width: 48,
-        Height: 36,
-        Qty: 1,
-        RollLength: LinerRollLength.Roll59,
-        Thickness: LinerThickness.One_Inch,
-        PieceMode: LinerPieceMode.FourPiece,
-        Label: "AHU-1"
-    ),
+jsonOptions.Converters.Add(new JsonStringEnumConverter());
 
-    new(
-        Width: 24,
-        Height: 12,
-        Qty: 1,
-        RollLength: LinerRollLength.Roll56,
-        Thickness: LinerThickness.One_Inch,
-        PieceMode: LinerPieceMode.TwoPiece,
-        Label: "AHU-2"
-    ),
+string inputPath = GetInputPath(args);
+string json = File.ReadAllText(inputPath);
 
-    new(
-        Width: 48,
-        Height: 36,
-        Qty: 1,
-        RollLength: LinerRollLength.Roll59,
-        Thickness: LinerThickness.OneAndHalf_Inch,
-        PieceMode: LinerPieceMode.FourPiece,
-        Label: "RTU-1"
-    )
-};
-
-List<TurnVane> turnVanes = new()
-{
-    new(
-        CheekA: 24,
-        CheekB: 18,
-        Heel: 12,
-        Liner: LinerThickness.None,
-        Qty: 1,
-        Label: "AHU-1"
-    ),
-
-    new(
-        CheekA: 36,
-        CheekB: 24,
-        Heel: 16,
-        Liner: LinerThickness.One_Inch,
-        Qty: 2,
-        Label: "RTU-1"
-    ),
-
-    new(36, 36, 48, LinerThickness.One_Inch, 3, "#15", 2)
-};
-
-
+TestInputData input = JsonSerializer.Deserialize<TestInputData>(json, jsonOptions)
+    ?? throw new InvalidOperationException($"Could not read test input data from {inputPath}.");
 
 //Gather and Sort Data
-foreach (DuctmateFrame dmFrame in dmFrames)
+foreach (DuctmateFrame dmFrame in input.DuctmateFrames)
 {
     GeneratedBuildOutput output = dmGenerator.Generate(dmFrame);
 
@@ -100,7 +52,7 @@ foreach (DuctmateFrame dmFrame in dmFrames)
     rawCountCuts.AddRange(output.CountCuts);
 }
 
-foreach (Liner liner in liners)
+foreach (Liner liner in input.Liners)
 {
     GeneratedBuildOutput output = linerGenerator.Generate(liner);
 
@@ -109,7 +61,7 @@ foreach (Liner liner in liners)
     rawCountCuts.AddRange(output.CountCuts);
 }
 
-foreach (TurnVane turnVane in turnVanes)
+foreach (TurnVane turnVane in input.TurnVanes)
 {
     GeneratedBuildOutput output = turnVaneGenerator.Generate(turnVane);
 
@@ -238,3 +190,41 @@ foreach (BuildItemType buildType in buildTypes)
     Console.WriteLine();
 }
 
+static string GetInputPath(string[] args)
+{
+    if (args.Length > 0 && File.Exists(args[0]))
+    {
+        return args[0];
+    }
+
+    string currentDirectoryPath = Path.Combine(
+        Directory.GetCurrentDirectory(),
+        "test-inputs.json"
+    );
+
+    if (File.Exists(currentDirectoryPath))
+    {
+        return currentDirectoryPath;
+    }
+
+    string outputDirectoryPath = Path.Combine(
+        AppContext.BaseDirectory,
+        "test-inputs.json"
+    );
+
+    if (File.Exists(outputDirectoryPath))
+    {
+        return outputDirectoryPath;
+    }
+
+    throw new FileNotFoundException(
+        "Could not find test-inputs.json. Put it in the TestApp project folder, repo root, or pass the path as a command argument."
+    );
+}
+
+public sealed class TestInputData
+{
+    public List<DuctmateFrame> DuctmateFrames { get; init; } = new();
+    public List<Liner> Liners { get; init; } = new();
+    public List<TurnVane> TurnVanes { get; init; } = new();
+}
