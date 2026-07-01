@@ -78,5 +78,74 @@
       "label": "#15",
       "splitVanes": 2
     }
-  ]
+  ],
+
+  "flexConnectionTypes": [
+  {
+    "key": "sd",
+    "displayName": "S&D"
+  },
+  {
+    "key": "dns",
+    "displayName": "D&S"
+  },
+  {
+    "key": "tdc",
+    "displayName": "TDC"
+  },
+  {
+    "key": "raw",
+    "displayName": "Raw"
+  },
+  {
+    "key": "straight",
+    "displayName": "Straight"
+  },
+  {
+    "key": "flange",
+    "displayName": "Flange",
+    "usesFlangeOptions": true
+  }
+],
+
+"flexConnectors": [
+  {
+    "dimA": 24,
+    "dimB": 12,
+    "qty": 1,
+    "defaultConnectionTypeKey": "sd",
+    "label": "AHU-1"
+  },
+  {
+    "dimA": 36,
+    "dimB": 18,
+    "qty": 1,
+    "defaultConnectionTypeKey": "straight",
+    "sideConnections": [
+      {
+        "side": "Top",
+        "connectionTypeKey": "flange",
+        "flangeDirection": "Out",
+        "flangeSize": 1
+      },
+      {
+        "side": "Bottom",
+        "connectionTypeKey": "flange",
+        "flangeDirection": "Out",
+        "flangeSize": 1
+      },
+      {
+        "side": "Left",
+        "connectionTypeKey": "flange",
+        "flangeDirection": "In",
+        "flangeSize": 0.75
+      },
+      {
+        "side": "Right",
+        "connectionTypeKey": "straight"
+      }
+    ],
+    "label": "RTU-1"
+  }
+]
 }

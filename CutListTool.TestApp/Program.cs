@@ -227,4 +227,7 @@ public sealed class TestInputData
     public List<DuctmateFrame> DuctmateFrames { get; init; } = new();
     public List<Liner> Liners { get; init; } = new();
     public List<TurnVane> TurnVanes { get; init; } = new();
+
+    public List<FlexConnectionType> FlexConnectionTypes { get; init; } = new();
+    public List<FlexConnector> FlexConnectors { get; init; } = new();
 }

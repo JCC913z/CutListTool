@@ -69,4 +69,22 @@ public enum LinerPieceMode
     FourPiece
 }
 
+public enum FlexSize
+{
+    Large,
+    Small
+}
 
+public enum FlexSide
+{
+    Top,
+    Bottom,
+    Left,
+    Right
+}
+
+public enum FlangeDirection
+{
+    In,
+    Out
+}
