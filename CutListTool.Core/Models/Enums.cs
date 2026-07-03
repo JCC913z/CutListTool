@@ -75,7 +75,7 @@ public enum FlexSize
     Small
 }
 
-public enum FlexSide
+public enum FittingSide
 {
     Top,
     Bottom,

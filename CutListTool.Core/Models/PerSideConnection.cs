@@ -1,7 +1,7 @@
 namespace CutListTool.Core.Models;
 
-public sealed record FlexSideConnection(
-    FlexSide Side,
+public sealed record PerSideConnection(
+    FittingSide Side,
     string ConnectionTypeKey,
     FlangeDirection? FlangeDirection = null,
     decimal? FlangeSize = null

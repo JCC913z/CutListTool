@@ -231,15 +231,15 @@ static string GetInputPath(string[] args)
 
 static void PrintProofLoad(TestInputData input)
 {
-    Dictionary<string, FlexConnectionType> connectionTypesByKey = input.FlexConnectionTypes
+    Dictionary<string, ConnectionType> connectionTypesByKey = input.ConnectionTypes
         .ToDictionary(
             connectionType => connectionType.Key,
             StringComparer.OrdinalIgnoreCase
         );
 
-    Console.WriteLine("Loaded Flex Connection Types");
+    Console.WriteLine("Loaded Connection Types");
     Console.WriteLine("============================");
-    foreach (FlexConnectionType connectionType in input.FlexConnectionTypes)
+    foreach (ConnectionType connectionType in input.ConnectionTypes)
     {
         string flangeNote = connectionType.UsesFlangeOptions
             ? " - uses flange options"
@@ -256,12 +256,12 @@ static void PrintProofLoad(TestInputData input)
 
     foreach (FlexConnector flexConnector in input.FlexConnectors)
     {
-        string connectionAText = GetFlexConnectionText(
+        string connectionAText = GetConnectionText(
             flexConnector.ConnectionA,
             connectionTypesByKey
         );
 
-        string connectionBText = GetFlexConnectionText(
+        string connectionBText = GetConnectionText(
             flexConnector.ConnectionB,
             connectionTypesByKey
         );
@@ -287,14 +287,14 @@ static void PrintProofLoad(TestInputData input)
     }
 }
 
-static string GetFlexConnectionText(
-    FlexConnection connection,
-    Dictionary<string, FlexConnectionType> connectionTypesByKey
+static string GetConnectionText(
+    Connection connection,
+    Dictionary<string, ConnectionType> connectionTypesByKey
 )
 {
     if (!connectionTypesByKey.TryGetValue(
         connection.ConnectionTypeKey,
-        out FlexConnectionType? connectionType
+        out ConnectionType? connectionType
     ))
     {
         return $"UNKNOWN CONNECTION TYPE: {connection.ConnectionTypeKey}";
@@ -318,12 +318,12 @@ static string GetFlexConnectionText(
 
 static void PrintConnectionSideDetails(
     string connectionName,
-    FlexConnection connection,
-    Dictionary<string, FlexConnectionType> connectionTypesByKey
+    Connection connection,
+    Dictionary<string, ConnectionType> connectionTypesByKey
 )
 {
-    List<FlexSideConnection> sideConnections =
-        connection.SideConnections ?? new List<FlexSideConnection>();
+    List<PerSideConnection> sideConnections =
+        connection.SideConnections ?? new List<PerSideConnection>();
 
     if (sideConnections.Count == 0)
     {
@@ -332,7 +332,7 @@ static void PrintConnectionSideDetails(
 
     Console.WriteLine($"  {connectionName} side details:");
 
-    foreach (FlexSideConnection sideConnection in sideConnections)
+    foreach (PerSideConnection sideConnection in sideConnections)
     {
         string sideText = GetSideConnectionText(
             sideConnection,
@@ -344,13 +344,13 @@ static void PrintConnectionSideDetails(
 }
 
 static string GetSideConnectionText(
-    FlexSideConnection sideConnection,
-    Dictionary<string, FlexConnectionType> connectionTypesByKey
+    PerSideConnection sideConnection,
+    Dictionary<string, ConnectionType> connectionTypesByKey
 )
 {
     if (!connectionTypesByKey.TryGetValue(
         sideConnection.ConnectionTypeKey,
-        out FlexConnectionType? connectionType
+        out ConnectionType? connectionType
     ))
     {
         return $"UNKNOWN CONNECTION TYPE: {sideConnection.ConnectionTypeKey}";
@@ -399,7 +399,7 @@ public sealed class TestInputData
     public List<Liner> Liners { get; init; } = new();
     public List<TurnVane> TurnVanes { get; init; } = new();
 
-    public List<FlexConnectionType> FlexConnectionTypes { get; init; } = new();
+    public List<ConnectionType> ConnectionTypes { get; init; } = new();
     public List<FlexConnector> FlexConnectors { get; init; } = new();
 }
 

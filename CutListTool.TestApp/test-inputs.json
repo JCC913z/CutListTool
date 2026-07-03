@@ -80,7 +80,7 @@
     }
   ],
 
-  "flexConnectionTypes": [
+  "connectionTypes": [
   {
     "key": "sd",
     "displayName": "S&D"
