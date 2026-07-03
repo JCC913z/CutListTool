@@ -299,37 +299,22 @@ static string GetFlexConnectionText(
     {
         return $"UNKNOWN CONNECTION TYPE: {connection.ConnectionTypeKey}";
     }
-
-    if (connection.SideConnections is not null && connection.SideConnections.Count > 0)
+    else if (connection.SideConnections is not null && connection.SideConnections.Count > 0)
     {
         return $"Custom {connectionType.DisplayName}";
     }
-
-    if (!connectionType.UsesFlangeOptions)
+    else if (connectionType.UsesFlangeOptions)
+    {
+        return GetFlangeText(
+            connection.FlangeDirection,
+            connection.FlangeSize
+        );
+    }
+    else
     {
         return connectionType.DisplayName;
     }
-
-    if (connection.FlangeDirection is null || connection.FlangeSize is null)
-    {
-        return $"{connectionType.DisplayName} - MISSING FLANGE OPTIONS";
-    }
-
-    if (connectionType.UsesFlangeOptions)
-    {
-        if (connection.SideConnections is not null && connection.SideConnections.Count > 0)
-        {
-            return "Custom Flange";
-        }
-
-        return GetFlangeText(connection.FlangeDirection, connection.FlangeSize);
-    }
-
-    string flangeSizeText = connection.FlangeSize.Value.ToString("0.###");
-
-    return $"{flangeSizeText}\" F.{connection.FlangeDirection.Value.ToString()[0]}.";
 }
-
 
 static void PrintConnectionSideDetails(
     string connectionName,
@@ -370,50 +355,42 @@ static string GetSideConnectionText(
     {
         return $"UNKNOWN CONNECTION TYPE: {sideConnection.ConnectionTypeKey}";
     }
-
-    if (!connectionType.UsesFlangeOptions)
-    {
-        return connectionType.DisplayName;
-    }
-
-    if (sideConnection.FlangeDirection is null || sideConnection.FlangeSize is null)
-    {
-        return $"{connectionType.DisplayName} - MISSING FLANGE OPTIONS";
-    }
-
-    if (connectionType.UsesFlangeOptions)
+    else if (connectionType.UsesFlangeOptions)
     {
         return GetFlangeText(
             sideConnection.FlangeDirection,
             sideConnection.FlangeSize
         );
     }
-
-    string flangeSizeText = sideConnection.FlangeSize.Value.ToString("0.###");
-
-    return $"{flangeSizeText}\" F.{sideConnection.FlangeDirection.Value.ToString()[0]}.";
+    else
+    {
+        return connectionType.DisplayName;
+    }
 }
 
-static string GetFlangeText(FlangeDirection? flangeDirection, decimal? flangeSize)
+static string GetFlangeText(
+    FlangeDirection? flangeDirection,
+    decimal? flangeSize
+)
 {
     if (flangeDirection is null)
     {
         return "MISSING FLANGE DIRECTION";
     }
-
-    if (flangeDirection == FlangeDirection.Straight)
+    else if (flangeDirection == FlangeDirection.Straight)
     {
         return "Straight";
     }
-
-    if (flangeSize is null)
+    else if (flangeSize is null)
     {
         return $"F{flangeDirection.Value.ToString()[0]} - MISSING FLANGE SIZE";
     }
+    else
+    {
+        string flangeSizeText = flangeSize.Value.ToString("0.###");
 
-    string flangeSizeText = flangeSize.Value.ToString("0.###");
-
-    return $"{flangeSizeText}\" F{flangeDirection.Value.ToString()[0]}";
+        return $"{flangeSizeText}\" F{flangeDirection.Value.ToString()[0]}";
+    }
 }
 
 public sealed class TestInputData
