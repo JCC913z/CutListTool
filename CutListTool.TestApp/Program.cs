@@ -42,6 +42,13 @@ string json = File.ReadAllText(inputPath);
 TestInputData input = JsonSerializer.Deserialize<TestInputData>(json, jsonOptions)
     ?? throw new InvalidOperationException($"Could not read test input data from {inputPath}.");
 
+bool proofLoadOnly = true;
+if (proofLoadOnly)
+{
+    PrintProofLoad(input);
+    return;
+}
+
 //Gather and Sort Data
 foreach (DuctmateFrame dmFrame in input.DuctmateFrames)
 {
@@ -220,6 +227,110 @@ static string GetInputPath(string[] args)
     throw new FileNotFoundException(
         "Could not find test-inputs.json. Put it in the TestApp project folder, repo root, or pass the path as a command argument."
     );
+}
+
+static void PrintProofLoad(TestInputData input)
+{
+    Dictionary<string, FlexConnectionType> connectionTypesByKey = input.FlexConnectionTypes
+        .ToDictionary(
+            connectionType => connectionType.Key,
+            StringComparer.OrdinalIgnoreCase
+        );
+
+    Console.WriteLine("Loaded Flex Connection Types");
+    Console.WriteLine("============================");
+    foreach (FlexConnectionType connectionType in input.FlexConnectionTypes)
+    {
+        string flangeNote = connectionType.UsesFlangeOptions
+            ? " - uses flange options"
+            : "";
+
+        Console.WriteLine(
+            $"{connectionType.Key} = {connectionType.DisplayName}{flangeNote}"
+        );
+    }
+
+    Console.WriteLine();
+    Console.WriteLine("Loaded Flex Connectors");
+    Console.WriteLine("======================");
+
+    foreach (FlexConnector flexConnector in input.FlexConnectors)
+    {
+        string defaultConnectionText = GetConnectionDisplayName(
+            flexConnector.DefaultConnectionTypeKey,
+            connectionTypesByKey
+        );
+
+        Console.WriteLine();
+        Console.WriteLine(
+            $"{flexConnector.Label} - {flexConnector.DimA}\" x {flexConnector.DimB}\" ({flexConnector.Qty}x)"
+        );
+
+        Console.WriteLine($"Default Connection: {defaultConnectionText}");
+
+        List<FlexSideConnection> sideConnections =
+            flexConnector.SideConnections ?? new List<FlexSideConnection>();
+
+        if (sideConnections.Count == 0)
+        {
+            Console.WriteLine($"  All sides: {defaultConnectionText}");
+            continue;
+        }
+
+        foreach (FlexSideConnection sideConnection in sideConnections)
+        {
+            string sideText = GetSideConnectionText(
+                sideConnection,
+                connectionTypesByKey
+            );
+
+            Console.WriteLine($"  {sideConnection.Side}: {sideText}");
+        }
+    }
+}
+
+static string GetConnectionDisplayName(
+    string connectionTypeKey,
+    Dictionary<string, FlexConnectionType> connectionTypesByKey
+)
+{
+    if (!connectionTypesByKey.TryGetValue(
+        connectionTypeKey,
+        out FlexConnectionType? connectionType
+    ))
+    {
+        return $"UNKNOWN CONNECTION TYPE: {connectionTypeKey}";
+    }
+
+    return connectionType.DisplayName;
+}
+
+static string GetSideConnectionText(
+    FlexSideConnection sideConnection,
+    Dictionary<string, FlexConnectionType> connectionTypesByKey
+)
+{
+    if (!connectionTypesByKey.TryGetValue(
+        sideConnection.ConnectionTypeKey,
+        out FlexConnectionType? connectionType
+    ))
+    {
+        return $"UNKNOWN CONNECTION TYPE: {sideConnection.ConnectionTypeKey}";
+    }
+
+    if (!connectionType.UsesFlangeOptions)
+    {
+        return connectionType.DisplayName;
+    }
+
+    if (sideConnection.FlangeDirection is null || sideConnection.FlangeSize is null)
+    {
+        return $"{connectionType.DisplayName} - MISSING FLANGE OPTIONS";
+    }
+
+    string flangeSizeText = sideConnection.FlangeSize.Value.ToString("0.###");
+
+    return $"{connectionType.DisplayName} {sideConnection.FlangeDirection} {flangeSizeText}\"";
 }
 
 public sealed class TestInputData
