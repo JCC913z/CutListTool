@@ -98,10 +98,6 @@
     "displayName": "Raw"
   },
   {
-    "key": "straight",
-    "displayName": "Straight"
-  },
-  {
     "key": "flange",
     "displayName": "Flange",
     "usesFlangeOptions": true
@@ -113,39 +109,76 @@
     "dimA": 24,
     "dimB": 12,
     "qty": 1,
-    "defaultConnectionTypeKey": "sd",
+    "connectionA": {
+      "connectionTypeKey": "sd"
+    },
+    "connectionB": {
+      "connectionTypeKey": "sd"
+    },
     "label": "AHU-1"
+  },
+  {
+    "dimA": 30,
+    "dimB": 16,
+    "qty": 1,
+    "connectionA": {
+      "connectionTypeKey": "tdc"
+    },
+    "connectionB": {
+      "connectionTypeKey": "raw"
+    },
+    "label": "AHU-2"
   },
   {
     "dimA": 36,
     "dimB": 18,
     "qty": 1,
-    "defaultConnectionTypeKey": "straight",
-    "sideConnections": [
-      {
-        "side": "Top",
-        "connectionTypeKey": "flange",
-        "flangeDirection": "Out",
-        "flangeSize": 1
-      },
-      {
-        "side": "Bottom",
-        "connectionTypeKey": "flange",
-        "flangeDirection": "Out",
-        "flangeSize": 1
-      },
-      {
-        "side": "Left",
-        "connectionTypeKey": "flange",
-        "flangeDirection": "In",
-        "flangeSize": 0.75
-      },
-      {
-        "side": "Right",
-        "connectionTypeKey": "straight"
-      }
-    ],
+    "connectionA": {
+      "connectionTypeKey": "sd"
+    },
+    "connectionB": {
+      "connectionTypeKey": "flange",
+      "flangeDirection": "Out",
+      "flangeSize": 1
+    },
     "label": "RTU-1"
+  },
+  {
+    "dimA": 36,
+    "dimB": 18,
+    "qty": 1,
+    "connectionA": {
+      "connectionTypeKey": "tdc"
+    },
+    "connectionB": {
+      "connectionTypeKey": "flange",
+      "sideConnections": [
+        {
+          "side": "Top",
+          "connectionTypeKey": "flange",
+          "flangeDirection": "Out",
+          "flangeSize": 1
+        },
+        {
+          "side": "Bottom",
+          "connectionTypeKey": "flange",
+          "flangeDirection": "Out",
+          "flangeSize": 1
+        },
+        {
+          "side": "Left",
+          "connectionTypeKey": "flange",
+          "flangeDirection": "In",
+          "flangeSize": 0.75
+        },
+        {
+          "side": "Right",
+          "connectionTypeKey": "flange",
+          "flangeDirection": "Straight"
+        }
+      ]
+    },
+    "label": "RTU-2"
   }
 ]
 }

@@ -86,5 +86,6 @@ public enum FlexSide
 public enum FlangeDirection
 {
     In,
-    Out
+    Out,
+    Straight
 }

@@ -256,8 +256,13 @@ static void PrintProofLoad(TestInputData input)
 
     foreach (FlexConnector flexConnector in input.FlexConnectors)
     {
-        string defaultConnectionText = GetConnectionDisplayName(
-            flexConnector.DefaultConnectionTypeKey,
+        string connectionAText = GetFlexConnectionText(
+            flexConnector.ConnectionA,
+            connectionTypesByKey
+        );
+
+        string connectionBText = GetFlexConnectionText(
+            flexConnector.ConnectionB,
             connectionTypesByKey
         );
 
@@ -266,43 +271,91 @@ static void PrintProofLoad(TestInputData input)
             $"{flexConnector.Label} - {flexConnector.DimA}\" x {flexConnector.DimB}\" ({flexConnector.Qty}x)"
         );
 
-        Console.WriteLine($"Default Connection: {defaultConnectionText}");
+        Console.WriteLine($"  {connectionAText} -> {connectionBText}");
 
-        List<FlexSideConnection> sideConnections =
-            flexConnector.SideConnections ?? new List<FlexSideConnection>();
+        PrintConnectionSideDetails(
+            "Connection A",
+            flexConnector.ConnectionA,
+            connectionTypesByKey
+        );
 
-        if (sideConnections.Count == 0)
-        {
-            Console.WriteLine($"  All sides: {defaultConnectionText}");
-            continue;
-        }
-
-        foreach (FlexSideConnection sideConnection in sideConnections)
-        {
-            string sideText = GetSideConnectionText(
-                sideConnection,
-                connectionTypesByKey
-            );
-
-            Console.WriteLine($"  {sideConnection.Side}: {sideText}");
-        }
+        PrintConnectionSideDetails(
+            "Connection B",
+            flexConnector.ConnectionB,
+            connectionTypesByKey
+        );
     }
 }
 
-static string GetConnectionDisplayName(
-    string connectionTypeKey,
+static string GetFlexConnectionText(
+    FlexConnection connection,
     Dictionary<string, FlexConnectionType> connectionTypesByKey
 )
 {
     if (!connectionTypesByKey.TryGetValue(
-        connectionTypeKey,
+        connection.ConnectionTypeKey,
         out FlexConnectionType? connectionType
     ))
     {
-        return $"UNKNOWN CONNECTION TYPE: {connectionTypeKey}";
+        return $"UNKNOWN CONNECTION TYPE: {connection.ConnectionTypeKey}";
     }
 
-    return connectionType.DisplayName;
+    if (connection.SideConnections is not null && connection.SideConnections.Count > 0)
+    {
+        return $"Custom {connectionType.DisplayName}";
+    }
+
+    if (!connectionType.UsesFlangeOptions)
+    {
+        return connectionType.DisplayName;
+    }
+
+    if (connection.FlangeDirection is null || connection.FlangeSize is null)
+    {
+        return $"{connectionType.DisplayName} - MISSING FLANGE OPTIONS";
+    }
+
+    if (connectionType.UsesFlangeOptions)
+    {
+        if (connection.SideConnections is not null && connection.SideConnections.Count > 0)
+        {
+            return "Custom Flange";
+        }
+
+        return GetFlangeText(connection.FlangeDirection, connection.FlangeSize);
+    }
+
+    string flangeSizeText = connection.FlangeSize.Value.ToString("0.###");
+
+    return $"{flangeSizeText}\" F.{connection.FlangeDirection.Value.ToString()[0]}.";
+}
+
+
+static void PrintConnectionSideDetails(
+    string connectionName,
+    FlexConnection connection,
+    Dictionary<string, FlexConnectionType> connectionTypesByKey
+)
+{
+    List<FlexSideConnection> sideConnections =
+        connection.SideConnections ?? new List<FlexSideConnection>();
+
+    if (sideConnections.Count == 0)
+    {
+        return;
+    }
+
+    Console.WriteLine($"  {connectionName} side details:");
+
+    foreach (FlexSideConnection sideConnection in sideConnections)
+    {
+        string sideText = GetSideConnectionText(
+            sideConnection,
+            connectionTypesByKey
+        );
+
+        Console.WriteLine($"    {sideConnection.Side}: {sideText}");
+    }
 }
 
 static string GetSideConnectionText(
@@ -328,9 +381,39 @@ static string GetSideConnectionText(
         return $"{connectionType.DisplayName} - MISSING FLANGE OPTIONS";
     }
 
+    if (connectionType.UsesFlangeOptions)
+    {
+        return GetFlangeText(
+            sideConnection.FlangeDirection,
+            sideConnection.FlangeSize
+        );
+    }
+
     string flangeSizeText = sideConnection.FlangeSize.Value.ToString("0.###");
 
-    return $"{connectionType.DisplayName} {sideConnection.FlangeDirection} {flangeSizeText}\"";
+    return $"{flangeSizeText}\" F.{sideConnection.FlangeDirection.Value.ToString()[0]}.";
+}
+
+static string GetFlangeText(FlangeDirection? flangeDirection, decimal? flangeSize)
+{
+    if (flangeDirection is null)
+    {
+        return "MISSING FLANGE DIRECTION";
+    }
+
+    if (flangeDirection == FlangeDirection.Straight)
+    {
+        return "Straight";
+    }
+
+    if (flangeSize is null)
+    {
+        return $"F{flangeDirection.Value.ToString()[0]} - MISSING FLANGE SIZE";
+    }
+
+    string flangeSizeText = flangeSize.Value.ToString("0.###");
+
+    return $"{flangeSizeText}\" F{flangeDirection.Value.ToString()[0]}";
 }
 
 public sealed class TestInputData
@@ -342,3 +425,4 @@ public sealed class TestInputData
     public List<FlexConnectionType> FlexConnectionTypes { get; init; } = new();
     public List<FlexConnector> FlexConnectors { get; init; } = new();
 }
+

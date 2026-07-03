@@ -4,8 +4,8 @@ public readonly record struct FlexConnector(
     decimal DimA,
     decimal DimB,
     int Qty,
-    string DefaultConnectionTypeKey,
-    List<FlexSideConnection>? SideConnections = null,
+    FlexConnection ConnectionA,
+    FlexConnection ConnectionB,
     string? Label = null
 ) : IBuildItem
 {
