@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using CutListTool.Core.Models;
 using CutListTool.Core.Services;
 using CutListTool.Core.Settings;
@@ -35,7 +34,7 @@ public class FlexConnectorGenerator
             case FlexPieceCount.OnePiece:
             {                    
                 decimal length = 2 * (flexConnector.DimA + flexConnector.DimB) + (2 * prefs.CanvasAddPerSide);
-                linearCuts.AddRange(
+                linearCuts.Add(
                     new LinearCutItem(
                         Length: length,
                         Qty: flexConnector.Qty,
@@ -50,7 +49,7 @@ public class FlexConnectorGenerator
             case FlexPieceCount.TwoPiece:
             {                    
                 decimal length = flexConnector.DimA + flexConnector.DimB + (2 * prefs.CanvasAddPerSide);
-                linearCuts.AddRange(
+                linearCuts.Add(
                     new LinearCutItem(
                         Length: length,
                         Qty: flexConnector.Qty * 2,
@@ -82,8 +81,14 @@ public class FlexConnectorGenerator
                 );
                 break;
 
-            default: Console.WriteLine("No FlexPieceCount Assigned");
-            break;
+            default:
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(flexConnector.PieceCount),
+                    flexConnector.PieceCount,
+                    "Unsupported flex piece count."
+                );
+            }
         };
         
 

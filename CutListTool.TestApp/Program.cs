@@ -21,13 +21,9 @@ bool proofLoadOnly = false;
 //Initialization
 UserPreferences prefs = new();
 
-List<BuildListLine> buildLines = new();
-List<LinearCutItem> rawLinearCuts = new();
-List<CountCutItem> rawCountCuts = new();
-
-DuctmateGenerator dmGenerator = new(prefs);
-LinerGenerator linerGenerator = new(prefs);
-TurnVaneGenerator turnVaneGenerator = new(prefs);
+List<BuildListLine> buildLines = [];
+List<LinearCutItem> rawLinearCuts = [];
+List<CountCutItem> rawCountCuts = [];
 
 JsonSerializerOptions jsonOptions = new()
 {
@@ -41,8 +37,12 @@ jsonOptions.Converters.Add(new JsonStringEnumConverter());
 string inputPath = GetInputPath(args);
 string json = File.ReadAllText(inputPath);
 
-TestInputData input = JsonSerializer.Deserialize<TestInputData>(json, jsonOptions)
-    ?? throw new InvalidOperationException($"Could not read test input data from {inputPath}.");
+TestInputData input = JsonSerializer.Deserialize<TestInputData>(json, jsonOptions) ?? throw new InvalidOperationException($"Could not read test input data from {inputPath}.");
+
+DuctmateGenerator dmGenerator = new(prefs);
+LinerGenerator linerGenerator = new(prefs);
+TurnVaneGenerator turnVaneGenerator = new(prefs);
+FlexConnectorGenerator flexConnectorGenerator = new(input.ConnectionTypes, prefs);
 
 if (proofLoadOnly)
 {
@@ -72,6 +72,15 @@ foreach (Liner liner in input.Liners)
 foreach (TurnVane turnVane in input.TurnVanes)
 {
     GeneratedBuildOutput output = turnVaneGenerator.Generate(turnVane);
+
+    buildLines.Add(output.BuildLine);
+    rawLinearCuts.AddRange(output.LinearCuts);
+    rawCountCuts.AddRange(output.CountCuts);
+}
+
+foreach (FlexConnector flexConnector in input.FlexConnectors)
+{
+    GeneratedBuildOutput output = flexConnectorGenerator.Generate(flexConnector);
 
     buildLines.Add(output.BuildLine);
     rawLinearCuts.AddRange(output.LinearCuts);

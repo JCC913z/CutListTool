@@ -101,6 +101,14 @@
     "key": "flange",
     "displayName": "Flange",
     "usesFlangeOptions": true
+  },
+  {
+    "key": "se",
+    "displayName": "SE"
+  },
+  {
+    "key": "be",
+    "displayName": "BE"
   }
 ],
 
@@ -109,6 +117,8 @@
     "dimA": 24,
     "dimB": 12,
     "qty": 1,
+    "size": "Small",
+    "pieceCount": "OnePiece",
     "connectionA": {
       "connectionTypeKey": "sd"
     },
@@ -118,9 +128,11 @@
     "label": "AHU-1"
   },
   {
-    "dimA": 30,
+    "dimA": 18,
     "dimB": 16,
     "qty": 1,
+    "size": "Large",
+    "pieceCount": "OnePiece",
     "connectionA": {
       "connectionTypeKey": "tdc"
     },
@@ -133,6 +145,8 @@
     "dimA": 36,
     "dimB": 18,
     "qty": 1,
+    "size": "Large",
+    "pieceCount": "TwoPiece",
     "connectionA": {
       "connectionTypeKey": "sd"
     },
@@ -144,9 +158,11 @@
     "label": "RTU-1"
   },
   {
-    "dimA": 36,
-    "dimB": 18,
+    "dimA": 72,
+    "dimB": 36,
     "qty": 1,
+    "size": "Large",
+    "pieceCount": "FourPiece",
     "connectionA": {
       "connectionTypeKey": "tdc"
     },
