@@ -16,6 +16,7 @@ public sealed record UserPreferences
     public decimal SplitterGap {get; init;} = 0.125m;    
 
     //Flex
+    public decimal CanvasAddPerSide {get; init;} = 3m;
 
     //FR Channel
 }

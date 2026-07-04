@@ -16,6 +16,8 @@ if (testing)
     return;
 }
 
+bool proofLoadOnly = false;
+
 //Initialization
 UserPreferences prefs = new();
 
@@ -42,7 +44,6 @@ string json = File.ReadAllText(inputPath);
 TestInputData input = JsonSerializer.Deserialize<TestInputData>(json, jsonOptions)
     ?? throw new InvalidOperationException($"Could not read test input data from {inputPath}.");
 
-bool proofLoadOnly = true;
 if (proofLoadOnly)
 {
     PrintProofLoad(input);

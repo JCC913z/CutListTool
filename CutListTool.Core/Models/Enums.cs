@@ -75,6 +75,13 @@ public enum FlexSize
     Small
 }
 
+public enum FlexPieceCount
+{
+    OnePiece,
+    TwoPiece,
+    FourPiece
+}
+
 public enum FittingSide
 {
     Top,
