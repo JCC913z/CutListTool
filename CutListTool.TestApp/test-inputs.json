@@ -116,7 +116,7 @@
   {
     "dimA": 24,
     "dimB": 12,
-    "qty": 1,
+    "qty": 2,
     "size": "Small",
     "pieceCount": "OnePiece",
     "connectionA": {
@@ -144,7 +144,7 @@
   {
     "dimA": 36,
     "dimB": 18,
-    "qty": 1,
+    "qty": 3,
     "size": "Large",
     "pieceCount": "TwoPiece",
     "connectionA": {
@@ -160,7 +160,7 @@
   {
     "dimA": 72,
     "dimB": 36,
-    "qty": 1,
+    "qty": 4,
     "size": "Large",
     "pieceCount": "FourPiece",
     "connectionA": {

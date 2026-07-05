@@ -104,12 +104,14 @@ List<BuildItemType> buildTypes = buildLines
 //Output Processes
 foreach (BuildItemType buildType in buildTypes)
 {
-    Console.WriteLine(buildType.ToString().ToUpper());
-    Console.WriteLine("==========");
+    Console.WriteLine("\t" + BuildTypeBorder(buildType));
+    Console.WriteLine("\t" + $"||-->  {buildType.ToString().ToUpper()}  <--||");
+    Console.WriteLine("\t" + BuildTypeBorder(buildType));
     Console.WriteLine();
 
-    Console.WriteLine("Build List");
-    Console.WriteLine("----------");
+    Console.WriteLine("*------------*");
+    Console.WriteLine("| BUILD LIST |");
+    Console.WriteLine("*------------*");
 
     List<BuildListLine> matchingBuildLines = buildLines
         .Where(line => line.BuildType == buildType)
@@ -119,12 +121,16 @@ foreach (BuildItemType buildType in buildTypes)
     foreach (BuildListLine buildLine in matchingBuildLines)
     {
         Console.WriteLine(buildLine.Text);
+        if (buildType == BuildItemType.Flex)
+        {
+            Console.WriteLine();
+        }
     }
 
     Console.WriteLine();
-
-    Console.WriteLine("Cut List");
-    Console.WriteLine("--------");
+    Console.WriteLine("*----------*");
+    Console.WriteLine("| CUT LIST |");
+    Console.WriteLine("*----------*");
 
     List<LinearCutItem> matchingLinearCuts = groupedLinearCuts
         .Where(cut => cut.BuildType == buildType)
@@ -144,12 +150,16 @@ foreach (BuildItemType buildType in buildTypes)
         .ToList()
     ;
 
+    bool showCutTypeHeaders = cutTypes.Count > 1;
+
     foreach (CutItemType cutType in cutTypes)
     {
-        Console.WriteLine();
-        Console.WriteLine(cutType);
-        Console.WriteLine("----------");
-
+        if (showCutTypeHeaders)
+        {
+            Console.WriteLine();
+            Console.WriteLine(cutType);
+            Console.WriteLine("----------");
+        }
         List<LinearCutItem> linearCutsForCutType = matchingLinearCuts
             .Where(cut => cut.CutType == cutType)
             .ToList()
@@ -171,7 +181,6 @@ foreach (BuildItemType buildType in buildTypes)
         {
             if (!string.IsNullOrWhiteSpace(groupLabel))
             {
-                Console.WriteLine();
                 Console.WriteLine(groupLabel);
                 Console.WriteLine("----------");
             }
@@ -202,9 +211,24 @@ foreach (BuildItemType buildType in buildTypes)
                     Console.WriteLine($"{cutItem.Qty} @ {cutItem.CountSize}");
                 }
             }
+            Console.WriteLine();
         }
     }
     Console.WriteLine();
+}
+
+static string BuildTypeBorder(BuildItemType buildItem)
+{
+    string border = "*";
+
+    for (int i = 0; i < buildItem.ToString().Length + 12; i++)
+    {
+        border += "=";
+    }
+
+    border += "*";
+
+    return border;
 }
 
 static string GetInputPath(string[] args)

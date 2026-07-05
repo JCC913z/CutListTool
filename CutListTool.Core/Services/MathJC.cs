@@ -23,4 +23,16 @@ public static class MathJC
         return result;
     }
 
+    public static T[] ReverseArray<T>(T[] array)
+    {
+        T[] revArray = new T[array.Length];
+
+        int length = array.Length;
+        for (int i = 0; i < length; i++)
+        {
+            revArray[i] = array[length - (i + 1)];
+        }
+
+        return revArray;
+    }
 }

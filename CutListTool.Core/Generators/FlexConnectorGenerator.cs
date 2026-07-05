@@ -20,7 +20,7 @@ public class FlexConnectorGenerator
 
     public GeneratedBuildOutput Generate(FlexConnector flexConnector)
     {
-        string groupLabel = GetGroupLabel(flexConnector);
+        string cutGroupLabel = $"{flexConnector.Size.ToString()} Flex";
 
         BuildListLine buildLine = new(
             BuildType: BuildItemType.Flex,
@@ -40,7 +40,7 @@ public class FlexConnectorGenerator
                         Qty: flexConnector.Qty,
                         BuildType: BuildItemType.Flex,
                         CutType: CutItemType.Flex,
-                        GroupLabel: groupLabel
+                        GroupLabel: cutGroupLabel
                     )
                 );
                 break;
@@ -55,20 +55,20 @@ public class FlexConnectorGenerator
                         Qty: flexConnector.Qty * 2,
                         BuildType: BuildItemType.Flex,
                         CutType: CutItemType.Flex,
-                        GroupLabel: groupLabel
+                        GroupLabel: cutGroupLabel
                     )
                 );
                 break;
             }
 
             case FlexPieceCount.FourPiece:
-                linearCuts.AddRange(
+                linearCuts.AddRange([
                     new LinearCutItem(
                         Length: flexConnector.DimA + (2 * prefs.CanvasAddPerSide),
                         Qty: flexConnector.Qty * 2,
                         BuildType: BuildItemType.Flex,
                         CutType: CutItemType.Flex,
-                        GroupLabel: groupLabel
+                        GroupLabel: cutGroupLabel
                     ),
 
                     new LinearCutItem(
@@ -76,9 +76,9 @@ public class FlexConnectorGenerator
                         Qty: flexConnector.Qty * 2,
                         BuildType: BuildItemType.Flex,
                         CutType: CutItemType.Flex,
-                        GroupLabel: groupLabel
+                        GroupLabel: cutGroupLabel
                     )
-                );
+                ]);
                 break;
 
             default:
@@ -104,8 +104,10 @@ public class FlexConnectorGenerator
     private string GetBuildListText(FlexConnector flexConnector)
     {
         string labelText = string.IsNullOrWhiteSpace(flexConnector.Label)
-            ? ""
-            : $"{flexConnector.Label} - ";
+        ? ""
+        : $"{flexConnector.Label} - ";
+
+        string flexSizeText = $"{flexConnector.Size.ToString()} Flex";
 
         string connectionAText = GetConnectionText(flexConnector.ConnectionA);
         string connectionBText = GetConnectionText(flexConnector.ConnectionB);
@@ -114,19 +116,65 @@ public class FlexConnectorGenerator
             GetConnectionSideDetailsText("A", flexConnector.ConnectionA)
             + GetConnectionSideDetailsText("B", flexConnector.ConnectionB);
 
-        return $"{labelText}({flexConnector.Qty}x) {MathJC.RoundToSixteenth(flexConnector.DimA)}\" x {MathJC.RoundToSixteenth(flexConnector.DimB)}\" - {connectionAText} -> {connectionBText}{sideDetailsText}";
+        string layoutText = GetLayoutText(flexConnector);
+
+        return $"{labelText}{flexConnector.Qty}x) {MathJC.RoundToSixteenth(flexConnector.DimA)}\" x {MathJC.RoundToSixteenth(flexConnector.DimB)}\" - {flexSizeText}"
+            + Environment.NewLine
+            + $"\tDetails: {connectionAText} -> {connectionBText}{sideDetailsText}"
+            + Environment.NewLine
+            + $"\tLayout: {layoutText}";
     }
 
-    private string GetGroupLabel(FlexConnector flexConnector)
+    private string GetLayoutText(FlexConnector flexConnector, bool reversed = false)
     {
-        string connectionAText = GetConnectionText(flexConnector.ConnectionA);
-        string connectionBText = GetConnectionText(flexConnector.ConnectionB);
+        int n = flexConnector.PieceCount switch
+        {
+          FlexPieceCount.OnePiece => 5,
+          FlexPieceCount.TwoPiece => 3,
+          FlexPieceCount.FourPiece => 2,  
+          _ => 0
+        };
+        decimal[] layoutLengths = new decimal[n];
 
-        string sideDetailsText =
-            GetConnectionSideDetailsText("A", flexConnector.ConnectionA)
-            + GetConnectionSideDetailsText("B", flexConnector.ConnectionB);
+        decimal largerSide;
+        decimal smallerSide;
 
-        return $"{connectionAText} -> {connectionBText}{sideDetailsText}";
+        if (flexConnector.DimB > flexConnector.DimA) { largerSide = flexConnector.DimB; smallerSide = flexConnector.DimA; }
+        else { largerSide = flexConnector.DimA; smallerSide = flexConnector.DimB; }
+
+        layoutLengths[0] = prefs.CanvasAddPerSide;
+
+        if (n > 2) //1 & 2 Piece
+        {
+            for (int i = 1; i < n; i++)
+            {
+                layoutLengths[i] = layoutLengths[i-1] + ( (i%2 != 0) ? smallerSide : largerSide );
+            }   
+
+            if (reversed)
+            {
+                layoutLengths = MathJC.ReverseArray(layoutLengths);
+            }
+
+            string layoutText = "[";
+            int j = 0;
+            while(j < layoutLengths.Length)
+            {
+                if(j > 0) {layoutText += " - ";}
+                layoutText += $"{MathJC.RoundToSixteenth(layoutLengths[j])}\"";
+                j++;                
+            }
+            layoutText += "]";
+
+            return layoutText;
+        }
+        else //4 Piece
+        {
+            return $"[{MathJC.RoundToSixteenth(prefs.CanvasAddPerSide)}\" - " +
+                $"{MathJC.RoundToSixteenth(flexConnector.DimA + prefs.CanvasAddPerSide)}\"] " +
+                $"And [{MathJC.RoundToSixteenth(prefs.CanvasAddPerSide)}\" - " +
+                $"{MathJC.RoundToSixteenth(flexConnector.DimB + prefs.CanvasAddPerSide)}\"]";
+        }        
     }
 
     private string GetConnectionText(Connection connection)
@@ -158,19 +206,28 @@ public class FlexConnectorGenerator
     private string GetConnectionSideDetailsText(string connectionLabel, Connection connection)
     {
         List<PerSideConnection> sideConnections =
-            connection.SideConnections ?? new List<PerSideConnection>();
+            connection.SideConnections ?? [];
 
         if (sideConnections.Count == 0)
         {
             return "";
         }
 
-        List<string> sideTexts = sideConnections
-            .OrderBy(sideConnection => sideConnection.Side)
-            .Select(sideConnection => $"{sideConnection.Side}: {GetSideConnectionText(sideConnection)}")
+        List<string> groupedSideTexts = sideConnections
+            .GroupBy(sideConnection => GetSideConnectionText(sideConnection))
+            .OrderBy(group => group.Min(sideConnection => sideConnection.Side))
+            .Select(group =>
+            {
+                List<string> sideNames = group
+                    .OrderBy(sideConnection => sideConnection.Side)
+                    .Select(sideConnection => sideConnection.Side.ToString())
+                    .ToList();
+
+                return $"{JoinSideNames(sideNames)}: {group.Key}";
+            })
             .ToList();
 
-        return $" | {connectionLabel} sides: {string.Join(", ", sideTexts)}";
+        return $" | {connectionLabel} sides: {string.Join(", ", groupedSideTexts)}";
     }
 
     private string GetSideConnectionText(PerSideConnection sideConnection)
@@ -217,5 +274,25 @@ public class FlexConnectorGenerator
         string flangeSizeText = flangeSize.Value.ToString("0.###");
 
         return $"{flangeSizeText}\" F{flangeDirection.Value.ToString()[0]}";
+    }
+
+    private string JoinSideNames(List<string> sideNames)
+    {
+        if (sideNames.Count == 0)
+        {
+            return "";
+        }
+
+        if (sideNames.Count == 1)
+        {
+            return sideNames[0];
+        }
+
+        if (sideNames.Count == 2)
+        {
+            return $"{sideNames[0]} and {sideNames[1]}";
+        }
+
+        return $"{string.Join(", ", sideNames.Take(sideNames.Count - 1))}, and {sideNames.Last()}";
     }
 }
