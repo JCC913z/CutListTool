@@ -9,6 +9,11 @@ public class FlexConnectorGenerator
     private readonly Dictionary<string, ConnectionType> connectionTypesByKey;
     private readonly UserPreferences prefs;
 
+    private readonly record struct FlexCutPiece(
+        decimal Length,
+        int QtyPerFlex
+    );
+
     public FlexConnectorGenerator(IEnumerable<ConnectionType> connectionTypes, UserPreferences preferences)
     {
         this.connectionTypesByKey = connectionTypes.ToDictionary(
@@ -20,77 +25,24 @@ public class FlexConnectorGenerator
 
     public GeneratedBuildOutput Generate(FlexConnector flexConnector)
     {
-        string cutGroupLabel = $"{flexConnector.Size.ToString()} Flex";
+        string cutGroupLabel = $"{flexConnector.Size} Flex";
 
         BuildListLine buildLine = new(
             BuildType: BuildItemType.Flex,
             Text: GetBuildListText(flexConnector)
         );
 
-        List<LinearCutItem> linearCuts = [];
-        
-        switch (flexConnector.PieceCount)
-        {
-            case FlexPieceCount.OnePiece:
-            {                    
-                decimal length = 2 * (flexConnector.DimA + flexConnector.DimB) + (2 * prefs.CanvasAddPerSide);
-                linearCuts.Add(
-                    new LinearCutItem(
-                        Length: length,
-                        Qty: flexConnector.Qty,
-                        BuildType: BuildItemType.Flex,
-                        CutType: CutItemType.Flex,
-                        GroupLabel: cutGroupLabel
-                    )
-                );
-                break;
-            }
+        List<FlexCutPiece> flexCutPieces = GetFlexCutPieces(flexConnector);
 
-            case FlexPieceCount.TwoPiece:
-            {                    
-                decimal length = flexConnector.DimA + flexConnector.DimB + (2 * prefs.CanvasAddPerSide);
-                linearCuts.Add(
-                    new LinearCutItem(
-                        Length: length,
-                        Qty: flexConnector.Qty * 2,
-                        BuildType: BuildItemType.Flex,
-                        CutType: CutItemType.Flex,
-                        GroupLabel: cutGroupLabel
-                    )
-                );
-                break;
-            }
-
-            case FlexPieceCount.FourPiece:
-                linearCuts.AddRange([
-                    new LinearCutItem(
-                        Length: flexConnector.DimA + (2 * prefs.CanvasAddPerSide),
-                        Qty: flexConnector.Qty * 2,
-                        BuildType: BuildItemType.Flex,
-                        CutType: CutItemType.Flex,
-                        GroupLabel: cutGroupLabel
-                    ),
-
-                    new LinearCutItem(
-                        Length: flexConnector.DimB + (2 * prefs.CanvasAddPerSide),
-                        Qty: flexConnector.Qty * 2,
-                        BuildType: BuildItemType.Flex,
-                        CutType: CutItemType.Flex,
-                        GroupLabel: cutGroupLabel
-                    )
-                ]);
-                break;
-
-            default:
-            {
-                throw new ArgumentOutOfRangeException(
-                    nameof(flexConnector.PieceCount),
-                    flexConnector.PieceCount,
-                    "Unsupported flex piece count."
-                );
-            }
-        };
-        
+        List<LinearCutItem> linearCuts = flexCutPieces
+            .Select(piece => new LinearCutItem(
+                Length: piece.Length,
+                Qty: flexConnector.Qty * piece.QtyPerFlex,
+                BuildType: BuildItemType.Flex,
+                CutType: CutItemType.Flex,
+                GroupLabel: cutGroupLabel
+            ))
+            .ToList();
 
         List<CountCutItem> countCuts = [];
 
@@ -118,7 +70,9 @@ public class FlexConnectorGenerator
 
         string layoutText = GetLayoutText(flexConnector);
 
-        return $"{labelText}{flexConnector.Qty}x) {MathJC.RoundToSixteenth(flexConnector.DimA)}\" x {MathJC.RoundToSixteenth(flexConnector.DimB)}\" - {flexSizeText}"
+        string buildListCutText = GetBuildListCutText(flexConnector);
+
+        return $"{labelText}{flexConnector.Qty}x) {MathJC.RoundToSixteenth(flexConnector.DimA)}\" x {MathJC.RoundToSixteenth(flexConnector.DimB)}\" - {{{buildListCutText} {flexSizeText}}}"
             + Environment.NewLine
             + $"\tDetails: {connectionAText} -> {connectionBText}{sideDetailsText}"
             + Environment.NewLine
@@ -132,7 +86,7 @@ public class FlexConnectorGenerator
           FlexPieceCount.OnePiece => 5,
           FlexPieceCount.TwoPiece => 3,
           FlexPieceCount.FourPiece => 2,  
-          _ => 0
+          _ => throw new ArgumentOutOfRangeException(nameof(flexConnector.PieceCount), flexConnector.PieceCount, "Unsupported flex piece count.")
         };
         decimal[] layoutLengths = new decimal[n];
 
@@ -172,7 +126,7 @@ public class FlexConnectorGenerator
         {
             return $"[{MathJC.RoundToSixteenth(prefs.CanvasAddPerSide)}\" - " +
                 $"{MathJC.RoundToSixteenth(flexConnector.DimA + prefs.CanvasAddPerSide)}\"] " +
-                $"And [{MathJC.RoundToSixteenth(prefs.CanvasAddPerSide)}\" - " +
+                $"& [{MathJC.RoundToSixteenth(prefs.CanvasAddPerSide)}\" - " +
                 $"{MathJC.RoundToSixteenth(flexConnector.DimB + prefs.CanvasAddPerSide)}\"]";
         }        
     }
@@ -295,4 +249,67 @@ public class FlexConnectorGenerator
 
         return $"{string.Join(", ", sideNames.Take(sideNames.Count - 1))}, and {sideNames.Last()}";
     }
+
+    private List<FlexCutPiece> GetFlexCutPieces(FlexConnector flexConnector)
+    {
+        return flexConnector.PieceCount switch
+        {
+            FlexPieceCount.OnePiece =>
+            [
+                new FlexCutPiece(
+                    Length: 2 * (flexConnector.DimA + flexConnector.DimB) + (2 * prefs.CanvasAddPerSide),
+                    QtyPerFlex: 1
+                )
+            ],
+
+            FlexPieceCount.TwoPiece =>
+            [
+                new FlexCutPiece(
+                    Length: flexConnector.DimA + flexConnector.DimB + (2 * prefs.CanvasAddPerSide),
+                    QtyPerFlex: 2
+                )
+            ],
+
+            FlexPieceCount.FourPiece =>
+            [
+                new FlexCutPiece(
+                    Length: flexConnector.DimA + (2 * prefs.CanvasAddPerSide),
+                    QtyPerFlex: 2
+                ),
+
+                new FlexCutPiece(
+                    Length: flexConnector.DimB + (2 * prefs.CanvasAddPerSide),
+                    QtyPerFlex: 2
+                )
+            ],
+
+            _ => throw new ArgumentOutOfRangeException(
+                nameof(flexConnector.PieceCount),
+                flexConnector.PieceCount,
+                "Unsupported flex piece count."
+            )
+        };
+    }
+
+    private string GetBuildListCutText(FlexConnector flexConnector)
+    {
+        List<FlexCutPiece> flexCutPieces = GetFlexCutPieces(flexConnector);
+
+        List<string> cutTexts = flexCutPieces
+            .Select(piece =>
+            {
+                string lengthText = $"{MathJC.RoundToSixteenth(piece.Length)}\"";
+
+                if (piece.QtyPerFlex == 1)
+                {
+                    return lengthText;
+                }
+
+                return $"{lengthText} [x{piece.QtyPerFlex}]";
+            })
+            .ToList();
+
+        return string.Join(" & ", cutTexts);
+    }
+
 }
