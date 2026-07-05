@@ -72,11 +72,34 @@ public class FlexConnectorGenerator
 
         string buildListCutText = GetBuildListCutText(flexConnector);
 
-        return $"{labelText}{flexConnector.Qty}x) {MathJC.RoundToSixteenth(flexConnector.DimA)}\" x {MathJC.RoundToSixteenth(flexConnector.DimB)}\" - {{{buildListCutText} {flexSizeText}}}"
+        string dimensionText = GetDimensionText(flexConnector);
+
+        return $"{labelText}{flexConnector.Qty}x) {dimensionText} - {{{buildListCutText} {flexSizeText}}}"
             + Environment.NewLine
             + $"\tDetails: {connectionAText} -> {connectionBText}{sideDetailsText}"
             + Environment.NewLine
             + $"\tLayout: {layoutText}";
+    }
+
+    private string GetDimensionText(FlexConnector flexConnector)
+    {
+        return flexConnector.Shape switch
+        {
+            ConnectorShape.Rectangular =>
+                $"{MathJC.RoundToSixteenth(flexConnector.DimA)}\" x {MathJC.RoundToSixteenth(flexConnector.DimB)}\"",
+
+            ConnectorShape.Round when flexConnector.DimA == flexConnector.DimB =>
+                $"{MathJC.RoundToSixteenth(flexConnector.DimA)}\" Round",
+
+            ConnectorShape.Round =>
+                $"{MathJC.RoundToSixteenth(flexConnector.DimA)}\" Round -> {MathJC.RoundToSixteenth(flexConnector.DimB)}\" Round",
+
+            _ => throw new ArgumentOutOfRangeException(
+                nameof(flexConnector.Shape),
+                flexConnector.Shape,
+                "Unsupported connector shape."
+            )
+        };
     }
 
     private string GetLayoutText(FlexConnector flexConnector, bool reversed = false)
@@ -252,6 +275,21 @@ public class FlexConnectorGenerator
 
     private List<FlexCutPiece> GetFlexCutPieces(FlexConnector flexConnector)
     {
+        return flexConnector.Shape switch
+        {
+            ConnectorShape.Rectangular => GetRectangularFlexCutPieces(flexConnector),
+            ConnectorShape.Round => GetRoundFlexCutPieces(flexConnector),
+
+            _ => throw new ArgumentOutOfRangeException(
+                nameof(flexConnector.Shape),
+                flexConnector.Shape,
+                "Unsupported connector shape."
+            )
+        };        
+    }
+
+    private List<FlexCutPiece> GetRectangularFlexCutPieces(FlexConnector flexConnector)
+    {
         return flexConnector.PieceCount switch
         {
             FlexPieceCount.OnePiece =>
@@ -289,6 +327,34 @@ public class FlexConnectorGenerator
                 "Unsupported flex piece count."
             )
         };
+    }
+
+    private List<FlexCutPiece> GetRoundFlexCutPieces(FlexConnector flexConnector)
+    {
+        // Put your round flex cut length math here.
+        // For round flex:
+        // DimA = connection A diameter.
+        // DimB = connection B diameter.
+        // Same-size round flex has DimA == DimB.
+        // Different-size round flex can have DimA != DimB.
+        //
+        // Set "length" to whatever the canvas cut length should be.
+
+        decimal length = 0m;
+        decimal diameter = (flexConnector.DimB > flexConnector.DimA) ? flexConnector.DimB : flexConnector.DimA;
+        bool smallEnd = flexConnector.ConnectionA.SmallEnd && flexConnector.ConnectionB.SmallEnd;
+
+
+        length = MathJC.RoundStretchOut(diameter, smallEnd);
+        length += 2 * prefs.CanvasAddPerSide;
+
+        return
+        [
+            new FlexCutPiece(
+                Length: length,
+                QtyPerFlex: 1
+            )
+        ];
     }
 
     private string GetBuildListCutText(FlexConnector flexConnector)

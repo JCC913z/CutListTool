@@ -8,7 +8,8 @@ public readonly record struct FlexConnector(
     FlexPieceCount PieceCount,
     Connection ConnectionA,
     Connection ConnectionB,
-    string? Label = null
+    string? Label = null,
+    ConnectorShape Shape = ConnectorShape.Rectangular
 ) : IBuildItem
 {
     public BuildItemType BuildType => BuildItemType.Flex;

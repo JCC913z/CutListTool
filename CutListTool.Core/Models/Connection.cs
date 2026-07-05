@@ -4,5 +4,6 @@ public sealed record Connection(
     string ConnectionTypeKey,
     FlangeDirection? FlangeDirection = null,
     decimal? FlangeSize = null,
-    List<PerSideConnection>? SideConnections = null
+    List<PerSideConnection>? SideConnections = null,
+    bool SmallEnd = false
 );

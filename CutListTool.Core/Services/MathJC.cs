@@ -1,7 +1,11 @@
+using System.Net.NetworkInformation;
+
 namespace CutListTool.Core.Services;
 
 public static class MathJC
 {
+    public const decimal pi = 3.14159265358979m;
+
     public static string RoundToSixteenth(decimal number)
     {
         int i = (int)number;
@@ -29,10 +33,17 @@ public static class MathJC
 
         int length = array.Length;
         for (int i = 0; i < length; i++)
-        {
-            revArray[i] = array[length - (i + 1)];
+        {            revArray[i] = array[length - (i + 1)];
         }
 
         return revArray;
+    }
+
+    public static decimal RoundStretchOut(decimal nominalDiameter, bool se = false)
+    {
+        decimal diameter = se ? nominalDiameter - 0.125m : nominalDiameter;
+        decimal stretchOut = diameter * pi;
+
+        return stretchOut;
     }
 }

@@ -96,3 +96,9 @@ public enum FlangeDirection
     Out,
     Straight
 }
+
+public enum ConnectorShape
+{
+    Rectangular,
+    Round
+}
