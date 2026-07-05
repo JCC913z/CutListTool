@@ -17,6 +17,7 @@ public sealed record UserPreferences
 
     //Flex
     public decimal CanvasAddPerSide {get; init;} = 3m;
+    public bool ReverseLayoutOrder = true;
 
     //FR Channel
 }

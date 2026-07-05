@@ -68,7 +68,7 @@ public class FlexConnectorGenerator
             GetConnectionSideDetailsText("A", flexConnector.ConnectionA)
             + GetConnectionSideDetailsText("B", flexConnector.ConnectionB);
 
-        string layoutText = GetLayoutText(flexConnector);
+        string layoutText = GetLayoutText(flexConnector, prefs.ReverseLayoutOrder);
 
         string buildListCutText = GetBuildListCutText(flexConnector);
 
