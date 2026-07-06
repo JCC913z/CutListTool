@@ -172,7 +172,7 @@ public class FlexConnectorGenerator
     private string GetRoundLayoutText(FlexConnector flexConnector, bool reversed = false)
     {
         bool oneLayout = (flexConnector.DimA == flexConnector.DimB) && (flexConnector.ConnectionA.SmallEnd == flexConnector.ConnectionB.SmallEnd);
-        string layoutText = oneLayout ? "" : $"{flexConnector.DimA}\"-{GetConnectionText(flexConnector.ConnectionA)} = ";
+        string layoutText = oneLayout ? "" : $"{flexConnector.DimA}\"Rnd {GetConnectionText(flexConnector.ConnectionA)} = ";
 
         decimal cutLengthA = MathJC.RoundStretchOut(flexConnector.DimA, flexConnector.ConnectionA.SmallEnd);
 
@@ -181,7 +181,7 @@ public class FlexConnectorGenerator
 
         if (!oneLayout)
         {
-            layoutText += $" : {flexConnector.DimB}\"-{GetConnectionText(flexConnector.ConnectionB)} = ";
+            layoutText += $" : {flexConnector.DimB}\"Rnd {GetConnectionText(flexConnector.ConnectionB)} = ";
 
             decimal cutLengthB = MathJC.RoundStretchOut(flexConnector.DimB, flexConnector.ConnectionB.SmallEnd);
 

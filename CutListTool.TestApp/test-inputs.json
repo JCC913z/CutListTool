@@ -212,6 +212,42 @@
       "smallEnd": false
     },
     "label": "AHU-5"
+  },
+  {
+    "dimA": 12,
+    "dimB": 12,
+    "shape": "Round",
+    "qty": 3,
+    "size": "Small",
+    "pieceCount": "OnePiece",
+    "connectionA": {
+      "connectionTypeKey": "se",
+      "smallEnd": true
+    },
+    "connectionB": {
+      "connectionTypeKey": "se",
+      "smallEnd": true
+    },
+    "label": "AHU-6"
+  },
+    {
+    "dimA": 12,
+    "dimB": 13,
+    "shape": "Round",
+    "qty": 3,
+    "size": "Small",
+    "pieceCount": "OnePiece",
+    "connectionA": {
+      "connectionTypeKey": "se",
+      "smallEnd": true
+    },
+    "connectionB": {
+      "connectionTypeKey": "flange",
+      "flangeDirection": "Out",
+      "flangeSize": 1,
+      "smallEnd": false
+    },
+    "label": "AHU-7"
   }
 ]
 }
