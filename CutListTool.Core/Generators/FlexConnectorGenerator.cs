@@ -114,14 +114,12 @@ public class FlexConnectorGenerator
                 flexConnector.Shape,
                 "Unsupported connector shape."
             )
-        };
-
-            
+        };            
     }
 
     private string GetRectangularLayoutText(FlexConnector flexConnector, bool reversed = false)
     {
-            int n = flexConnector.PieceCount switch
+        int n = flexConnector.PieceCount switch
         {
             FlexPieceCount.OnePiece => 5,
             FlexPieceCount.TwoPiece => 3,
@@ -170,12 +168,26 @@ public class FlexConnectorGenerator
                 $"{MathJC.RoundToSixteenth(flexConnector.DimB + prefs.CanvasAddPerSide)}\"]";
         }
     }
+
     private string GetRoundLayoutText(FlexConnector flexConnector, bool reversed = false)
     {
-        decimal cutLength = GetRoundFlexCutPieces(flexConnector)[0].Length;
+        bool oneLayout = (flexConnector.DimA == flexConnector.DimB) && (flexConnector.ConnectionA.SmallEnd == flexConnector.ConnectionB.SmallEnd);
+        string layoutText = oneLayout ? "" : $"{flexConnector.DimA}\"-{GetConnectionText(flexConnector.ConnectionA)} = ";
 
-        string layoutText = $"[{MathJC.RoundToSixteenth(prefs.CanvasAddPerSide)}\" - " +
-            $"{MathJC.RoundToSixteenth(cutLength - prefs.CanvasAddPerSide)}\"]";
+        decimal cutLengthA = MathJC.RoundStretchOut(flexConnector.DimA, flexConnector.ConnectionA.SmallEnd);
+
+        layoutText += $"[{MathJC.RoundToSixteenth(prefs.CanvasAddPerSide)}\" - " +
+            $"{MathJC.RoundToSixteenth(cutLengthA + prefs.CanvasAddPerSide)}\"]";
+
+        if (!oneLayout)
+        {
+            layoutText += $" : {flexConnector.DimB}\"-{GetConnectionText(flexConnector.ConnectionB)} = ";
+
+            decimal cutLengthB = MathJC.RoundStretchOut(flexConnector.DimB, flexConnector.ConnectionB.SmallEnd);
+
+            layoutText += $"[{MathJC.RoundToSixteenth(prefs.CanvasAddPerSide)}\" - " +
+            $"{MathJC.RoundToSixteenth(cutLengthB + prefs.CanvasAddPerSide)}\"]";
+        }
 
         return layoutText;
     }
