@@ -1,6 +1,8 @@
 ﻿using CutListTool.Core.Generators;
 using CutListTool.Core.Models;
+using CutListTool.Core.Models.Outputs;
 using CutListTool.Core.Services;
+using CutListTool.Core.Services.Outputs;
 using CutListTool.Core.Settings;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -89,6 +91,11 @@ foreach (FlexConnector flexConnector in input.FlexConnectors)
 
 List<LinearCutItem> groupedLinearCuts = CutListGrouper.GroupLinearCuts(rawLinearCuts);
 List<CountCutItem> groupedCountCuts = CutListGrouper.GroupCountCuts(rawCountCuts);
+CutListOutputData cutListOutputData = CutListOutputBuilder.Build(
+    buildLines,
+    groupedLinearCuts,
+    groupedCountCuts
+);
 
 List<BuildItemType> buildTypes = buildLines
     .Select(line => line.BuildType)
@@ -100,136 +107,19 @@ List<BuildItemType> buildTypes = buildLines
 ;
 
 
-
 //Output Processes
-foreach (BuildItemType buildType in buildTypes)
-{
-    Console.WriteLine("\t" + BuildTypeBorder(buildType));
-    Console.WriteLine("\t" + $"||-->  {buildType.ToString().ToUpper()}  <--||");
-    Console.WriteLine("\t" + BuildTypeBorder(buildType));
-    Console.WriteLine();
+TextCutListOutputService textOutputService = new();
 
-    Console.WriteLine("*------------*");
-    Console.WriteLine("| BUILD LIST |");
-    Console.WriteLine("*------------*");
+string textOutput = textOutputService.Generate(cutListOutputData);
 
-    List<BuildListLine> matchingBuildLines = buildLines
-        .Where(line => line.BuildType == buildType)
-        .ToList()
-    ;
+Console.Write(textOutput);
 
-    foreach (BuildListLine buildLine in matchingBuildLines)
-    {
-        Console.WriteLine(buildLine.Text);
-        if (buildType == BuildItemType.Flex)
-        {
-            Console.WriteLine();
-        }
-    }
+JsonCutListOutputService jsonOutputService = new();
 
-    Console.WriteLine();
-    Console.WriteLine("*----------*");
-    Console.WriteLine("| CUT LIST |");
-    Console.WriteLine("*----------*");
+string jsonOutput = jsonOutputService.Generate(cutListOutputData);
 
-    List<LinearCutItem> matchingLinearCuts = groupedLinearCuts
-        .Where(cut => cut.BuildType == buildType)
-        .ToList()
-    ;
+File.WriteAllText("cut-list-output.json", jsonOutput);
 
-    List<CountCutItem> matchingCountCuts = groupedCountCuts
-        .Where(cut => cut.BuildType == buildType)
-        .ToList()
-    ;
-
-    List<CutItemType> cutTypes = matchingLinearCuts
-        .Select(cut => cut.CutType)
-        .Union(matchingCountCuts.Select(cut => cut.CutType))
-        .Distinct()
-        .OrderBy(cutType => cutType)
-        .ToList()
-    ;
-
-    bool showCutTypeHeaders = cutTypes.Count > 1;
-
-    foreach (CutItemType cutType in cutTypes)
-    {
-        if (showCutTypeHeaders)
-        {
-            Console.WriteLine();
-            Console.WriteLine(cutType);
-            Console.WriteLine("----------");
-        }
-        List<LinearCutItem> linearCutsForCutType = matchingLinearCuts
-            .Where(cut => cut.CutType == cutType)
-            .ToList()
-        ;
-
-        List<CountCutItem> countCutsForCutType = matchingCountCuts
-            .Where(cut => cut.CutType == cutType)
-            .ToList()
-        ;
-
-        List<string?> groupLabels = linearCutsForCutType
-            .Select(cut => cut.GroupLabel)
-            .Union(countCutsForCutType.Select(cut => cut.GroupLabel))
-            .Distinct()
-            .OrderBy(groupLabel => groupLabel)
-            .ToList();
-
-        foreach (string? groupLabel in groupLabels)
-        {
-            if (!string.IsNullOrWhiteSpace(groupLabel))
-            {
-                Console.WriteLine(groupLabel);
-                Console.WriteLine("----------");
-            }
-
-            List<LinearCutItem> linearCutsInGroup = linearCutsForCutType
-                .Where(cut => cut.GroupLabel == groupLabel)
-                .ToList();
-
-            foreach (LinearCutItem cutItem in linearCutsInGroup)
-            {
-                string displayLength = cutItem.Length.ToString();
-                if (cutItem.DisplayInSixteenths) { displayLength = MathJC.RoundToSixteenth(cutItem.Length); }
-                Console.WriteLine($"{cutItem.Qty} @ {displayLength}\"");
-            }
-
-            List<CountCutItem> countCutsInGroup = countCutsForCutType
-                .Where(cut => cut.GroupLabel == groupLabel)
-                .ToList();
-
-            foreach (CountCutItem cutItem in countCutsInGroup)
-            {
-                if (cutItem.CutType == CutItemType.TV_Rails)
-                {
-                    Console.WriteLine($"{cutItem.Qty} @ {cutItem.CountSize}-vane rail");
-                }
-                else
-                {
-                    Console.WriteLine($"{cutItem.Qty} @ {cutItem.CountSize}");
-                }
-            }
-            Console.WriteLine();
-        }
-    }
-    Console.WriteLine();
-}
-
-static string BuildTypeBorder(BuildItemType buildItem)
-{
-    string border = "*";
-
-    for (int i = 0; i < buildItem.ToString().Length + 12; i++)
-    {
-        border += "=";
-    }
-
-    border += "*";
-
-    return border;
-}
 
 static string GetInputPath(string[] args)
 {

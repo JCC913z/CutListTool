@@ -1,0 +1,342 @@
+{
+  "Sections": [
+    {
+      "BuildType": "Ductmate",
+      "BuildLines": [
+        {
+          "BuildType": "Ductmate",
+          "Text": "1x) 24\u0022 x 12\u0022 - AHU-1"
+        },
+        {
+          "BuildType": "Ductmate",
+          "Text": "1x) 36\u0022 x 12\u0022 - AHU-2"
+        },
+        {
+          "BuildType": "Ductmate",
+          "Text": "2x) 24\u0022 x 12\u0022 - RTU-1"
+        }
+      ],
+      "CutSections": [
+        {
+          "CutType": "Ductmate",
+          "Groups": [
+            {
+              "GroupLabel": null,
+              "LinearCuts": [
+                {
+                  "Length": 34.75,
+                  "Qty": 2,
+                  "BuildType": "Ductmate",
+                  "CutType": "Ductmate",
+                  "DisplayInSixteenths": true,
+                  "GroupLabel": null
+                },
+                {
+                  "Length": 22.75,
+                  "Qty": 6,
+                  "BuildType": "Ductmate",
+                  "CutType": "Ductmate",
+                  "DisplayInSixteenths": true,
+                  "GroupLabel": null
+                },
+                {
+                  "Length": 10.75,
+                  "Qty": 8,
+                  "BuildType": "Ductmate",
+                  "CutType": "Ductmate",
+                  "DisplayInSixteenths": true,
+                  "GroupLabel": null
+                }
+              ],
+              "CountCuts": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "BuildType": "Liner",
+      "BuildLines": [
+        {
+          "BuildType": "Liner",
+          "Text": "1x) 48\u0022 x 36\u0022 - 1\u0022 Liner - 59\u0022 Roll - FourPiece - AHU-1"
+        },
+        {
+          "BuildType": "Liner",
+          "Text": "1x) 24\u0022 x 12\u0022 - 1\u0022 Liner - 56\u0022 Roll - TwoPiece - AHU-2"
+        },
+        {
+          "BuildType": "Liner",
+          "Text": "1x) 48\u0022 x 36\u0022 - 1-1/2\u0022 Liner - 59\u0022 Roll - FourPiece - RTU-1"
+        }
+      ],
+      "CutSections": [
+        {
+          "CutType": "Liner",
+          "Groups": [
+            {
+              "GroupLabel": "1-1/2\u0022 Liner - 59\u0022 Roll",
+              "LinearCuts": [
+                {
+                  "Length": 46,
+                  "Qty": 2,
+                  "BuildType": "Liner",
+                  "CutType": "Liner",
+                  "DisplayInSixteenths": true,
+                  "GroupLabel": "1-1/2\u0022 Liner - 59\u0022 Roll"
+                },
+                {
+                  "Length": 35.5,
+                  "Qty": 2,
+                  "BuildType": "Liner",
+                  "CutType": "Liner",
+                  "DisplayInSixteenths": true,
+                  "GroupLabel": "1-1/2\u0022 Liner - 59\u0022 Roll"
+                }
+              ],
+              "CountCuts": []
+            },
+            {
+              "GroupLabel": "1\u0022 Liner - 56\u0022 Roll",
+              "LinearCuts": [
+                {
+                  "Length": 34.5,
+                  "Qty": 2,
+                  "BuildType": "Liner",
+                  "CutType": "Liner",
+                  "DisplayInSixteenths": true,
+                  "GroupLabel": "1\u0022 Liner - 56\u0022 Roll"
+                }
+              ],
+              "CountCuts": []
+            },
+            {
+              "GroupLabel": "1\u0022 Liner - 59\u0022 Roll",
+              "LinearCuts": [
+                {
+                  "Length": 46,
+                  "Qty": 2,
+                  "BuildType": "Liner",
+                  "CutType": "Liner",
+                  "DisplayInSixteenths": true,
+                  "GroupLabel": "1\u0022 Liner - 59\u0022 Roll"
+                },
+                {
+                  "Length": 35.5,
+                  "Qty": 2,
+                  "BuildType": "Liner",
+                  "CutType": "Liner",
+                  "DisplayInSixteenths": true,
+                  "GroupLabel": "1\u0022 Liner - 59\u0022 Roll"
+                }
+              ],
+              "CountCuts": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "BuildType": "TurnVane",
+      "BuildLines": [
+        {
+          "BuildType": "TurnVane",
+          "Text": "AHU-1 - 1x) 6 @ 11-3/4\u0022 - [24\u0022 x 18\u0022 Cheeks - 12\u0022 Heel - No Liner]"
+        },
+        {
+          "BuildType": "TurnVane",
+          "Text": "RTU-1 - 2x) 9 @ 15-1/4\u0022 - [36\u0022 x 24\u0022 Cheeks - 16\u0022 Heel - 1\u0022 Liner]"
+        },
+        {
+          "BuildType": "TurnVane",
+          "Text": "#15 - 3x) 10 @ 23-9/16\u0022 - Split [x2] - [36\u0022 Cheeks - 48\u0022 Heel - 1\u0022 Liner]"
+        }
+      ],
+      "CutSections": [
+        {
+          "CutType": "TV_Vanes",
+          "Groups": [
+            {
+              "GroupLabel": null,
+              "LinearCuts": [
+                {
+                  "Length": 23.5625,
+                  "Qty": 60,
+                  "BuildType": "TurnVane",
+                  "CutType": "TV_Vanes",
+                  "DisplayInSixteenths": false,
+                  "GroupLabel": null
+                },
+                {
+                  "Length": 15.250,
+                  "Qty": 18,
+                  "BuildType": "TurnVane",
+                  "CutType": "TV_Vanes",
+                  "DisplayInSixteenths": false,
+                  "GroupLabel": null
+                },
+                {
+                  "Length": 11.750,
+                  "Qty": 6,
+                  "BuildType": "TurnVane",
+                  "CutType": "TV_Vanes",
+                  "DisplayInSixteenths": false,
+                  "GroupLabel": null
+                }
+              ],
+              "CountCuts": []
+            }
+          ]
+        },
+        {
+          "CutType": "TV_Rails",
+          "Groups": [
+            {
+              "GroupLabel": null,
+              "LinearCuts": [],
+              "CountCuts": [
+                {
+                  "CountSize": 10,
+                  "Qty": 12,
+                  "BuildType": "TurnVane",
+                  "CutType": "TV_Rails",
+                  "GroupLabel": null
+                },
+                {
+                  "CountSize": 9,
+                  "Qty": 4,
+                  "BuildType": "TurnVane",
+                  "CutType": "TV_Rails",
+                  "GroupLabel": null
+                },
+                {
+                  "CountSize": 6,
+                  "Qty": 2,
+                  "BuildType": "TurnVane",
+                  "CutType": "TV_Rails",
+                  "GroupLabel": null
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "BuildType": "Flex",
+      "BuildLines": [
+        {
+          "BuildType": "Flex",
+          "Text": "AHU-1 - 2x) 24\u0022 x 12\u0022 - {78\u0022 Small Flex}\n\tDetails: S\u0026D -\u003E S\u0026D\n\tLayout: [75\u0022 - 51\u0022 - 39\u0022 - 15\u0022 - 3\u0022]"
+        },
+        {
+          "BuildType": "Flex",
+          "Text": "AHU-2 - 1x) 18\u0022 x 16\u0022 - {74\u0022 Large Flex}\n\tDetails: TDC -\u003E Raw\n\tLayout: [71\u0022 - 53\u0022 - 37\u0022 - 19\u0022 - 3\u0022]"
+        },
+        {
+          "BuildType": "Flex",
+          "Text": "RTU-1 - 3x) 36\u0022 x 18\u0022 - {60\u0022 [x2] Large Flex}\n\tDetails: S\u0026D -\u003E 1\u0022 FO\n\tLayout: [57\u0022 - 21\u0022 - 3\u0022]"
+        },
+        {
+          "BuildType": "Flex",
+          "Text": "RTU-2 - 4x) 72\u0022 x 36\u0022 - {78\u0022 [x2] \u0026 42\u0022 [x2] Large Flex}\n\tDetails: TDC -\u003E Custom Flange | B sides: Top and Bottom: 1\u0022 FO, Left: 0.75\u0022 FI, Right: Straight\n\tLayout: [3\u0022 - 75\u0022] \u0026 [3\u0022 - 39\u0022]"
+        },
+        {
+          "BuildType": "Flex",
+          "Text": "AHU-5 - 3x) 12\u0022 Round - {43-11/16\u0022 Small Flex}\n\tDetails: SE -\u003E BE\n\tLayout: 12\u0022Rnd SE = [3\u0022 - 40-5/16\u0022] : 12\u0022Rnd BE = [3\u0022 - 40-11/16\u0022]"
+        },
+        {
+          "BuildType": "Flex",
+          "Text": "AHU-6 - 3x) 12\u0022 Round - {43-5/16\u0022 Small Flex}\n\tDetails: SE -\u003E SE\n\tLayout: [3\u0022 - 40-5/16\u0022]"
+        },
+        {
+          "BuildType": "Flex",
+          "Text": "AHU-7 - 3x) 12\u0022 Round -\u003E 13\u0022 Round - {46-13/16\u0022 Small Flex}\n\tDetails: SE -\u003E 1\u0022 FO\n\tLayout: 12\u0022Rnd SE = [3\u0022 - 40-5/16\u0022] : 13\u0022Rnd 1\u0022 FO = [3\u0022 - 43-13/16\u0022]"
+        }
+      ],
+      "CutSections": [
+        {
+          "CutType": "Flex",
+          "Groups": [
+            {
+              "GroupLabel": "Large Flex",
+              "LinearCuts": [
+                {
+                  "Length": 78,
+                  "Qty": 8,
+                  "BuildType": "Flex",
+                  "CutType": "Flex",
+                  "DisplayInSixteenths": true,
+                  "GroupLabel": "Large Flex"
+                },
+                {
+                  "Length": 74,
+                  "Qty": 1,
+                  "BuildType": "Flex",
+                  "CutType": "Flex",
+                  "DisplayInSixteenths": true,
+                  "GroupLabel": "Large Flex"
+                },
+                {
+                  "Length": 60,
+                  "Qty": 6,
+                  "BuildType": "Flex",
+                  "CutType": "Flex",
+                  "DisplayInSixteenths": true,
+                  "GroupLabel": "Large Flex"
+                },
+                {
+                  "Length": 42,
+                  "Qty": 8,
+                  "BuildType": "Flex",
+                  "CutType": "Flex",
+                  "DisplayInSixteenths": true,
+                  "GroupLabel": "Large Flex"
+                }
+              ],
+              "CountCuts": []
+            },
+            {
+              "GroupLabel": "Small Flex",
+              "LinearCuts": [
+                {
+                  "Length": 78,
+                  "Qty": 2,
+                  "BuildType": "Flex",
+                  "CutType": "Flex",
+                  "DisplayInSixteenths": true,
+                  "GroupLabel": "Small Flex"
+                },
+                {
+                  "Length": 46.84070449666727,
+                  "Qty": 3,
+                  "BuildType": "Flex",
+                  "CutType": "Flex",
+                  "DisplayInSixteenths": true,
+                  "GroupLabel": "Small Flex"
+                },
+                {
+                  "Length": 43.69911184307748,
+                  "Qty": 3,
+                  "BuildType": "Flex",
+                  "CutType": "Flex",
+                  "DisplayInSixteenths": true,
+                  "GroupLabel": "Small Flex"
+                },
+                {
+                  "Length": 43.30641276137875625,
+                  "Qty": 3,
+                  "BuildType": "Flex",
+                  "CutType": "Flex",
+                  "DisplayInSixteenths": true,
+                  "GroupLabel": "Small Flex"
+                }
+              ],
+              "CountCuts": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
