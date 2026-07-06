@@ -12,7 +12,8 @@ public sealed class JsonCutListOutputService
     {
         jsonOptions = new JsonSerializerOptions
         {
-            WriteIndented = true
+            WriteIndented = true,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
         };
 
         jsonOptions.Converters.Add(new JsonStringEnumConverter());

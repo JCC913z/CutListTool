@@ -102,3 +102,10 @@ public enum ConnectorShape
     Rectangular,
     Round
 }
+
+public enum OutputMode
+{
+    Text,
+    Json,
+    Both
+}

@@ -18,7 +18,15 @@ if (testing)
     return;
 }
 
-bool proofLoadOnly = false;
+if (HasArgument(args, "--help") || HasArgument(args, "-h"))
+{
+    PrintHelp();
+    return;
+}
+
+bool proofLoadOnly = HasArgument(args, "--proof-load");
+OutputMode outputMode = GetOutputMode(args);
+string jsonOutputPath = GetJsonOutputPath(args);
 
 //Initialization
 UserPreferences prefs = new();
@@ -97,28 +105,28 @@ CutListOutputData cutListOutputData = CutListOutputBuilder.Build(
     groupedCountCuts
 );
 
-List<BuildItemType> buildTypes = buildLines
-    .Select(line => line.BuildType)
-    .Union(groupedLinearCuts.Select(cut => cut.BuildType))
-    .Union(groupedCountCuts.Select(cut => cut.BuildType))
-    .Distinct()
-    .OrderBy(type => type)
-    .ToList()
-;
 
 
 //Output Processes
-TextCutListOutputService textOutputService = new();
+if (outputMode == OutputMode.Text || outputMode == OutputMode.Both)
+{
+    TextCutListOutputService textOutputService = new();
 
-string textOutput = textOutputService.Generate(cutListOutputData);
+    string textOutput = textOutputService.Generate(cutListOutputData);
 
-Console.Write(textOutput);
+    Console.Write(textOutput);
+}
 
-JsonCutListOutputService jsonOutputService = new();
+if (outputMode == OutputMode.Json || outputMode == OutputMode.Both)
+{
+    JsonCutListOutputService jsonOutputService = new();
 
-string jsonOutput = jsonOutputService.Generate(cutListOutputData);
+    string jsonOutput = jsonOutputService.Generate(cutListOutputData);
 
-File.WriteAllText("cut-list-output.json", jsonOutput);
+    File.WriteAllText(jsonOutputPath, jsonOutput);
+
+    Console.WriteLine($"JSON output written to: {jsonOutputPath}");
+}
 
 
 static string GetInputPath(string[] args)
@@ -316,6 +324,94 @@ static string GetFlangeText(
         return $"{flangeSizeText}\" F{flangeDirection.Value.ToString()[0]}";
     }
 }
+
+static bool HasArgument(string[] args, string argumentName)
+{
+    return args.Any(arg =>
+        string.Equals(
+            arg,
+            argumentName,
+            StringComparison.OrdinalIgnoreCase
+        )
+    );
+}
+
+static OutputMode GetOutputMode(string[] args)
+{
+    bool textRequested = HasArgument(args, "--text");
+    bool jsonRequested = HasArgument(args, "--json");
+    bool bothRequested = HasArgument(args, "--both");
+
+    if (bothRequested || (textRequested && jsonRequested))
+    {
+        return OutputMode.Both;
+    }
+
+    if (jsonRequested)
+    {
+        return OutputMode.Json;
+    }
+
+    return OutputMode.Text;
+}
+
+static string GetJsonOutputPath(string[] args)
+{
+    string? outputPath = GetArgumentValue(args, "--out");
+
+    if (!string.IsNullOrWhiteSpace(outputPath))
+    {
+        return outputPath;
+    }
+
+    return "cut-list-output.json";
+}
+
+static string? GetArgumentValue(string[] args, string argumentName)
+{
+    for (int i = 0; i < args.Length - 1; i++)
+    {
+        if (string.Equals(
+            args[i],
+            argumentName,
+            StringComparison.OrdinalIgnoreCase
+        ))
+        {
+            return args[i + 1];
+        }
+    }
+
+    return null;
+}
+
+static void PrintHelp()
+{
+    Console.WriteLine("CutListTool TestApp");
+    Console.WriteLine();
+    Console.WriteLine("Usage:");
+    Console.WriteLine("  dotnet run");
+    Console.WriteLine("  dotnet run -- [input-file] [options]");
+    Console.WriteLine();
+    Console.WriteLine("Input:");
+    Console.WriteLine("  input-file        Optional path to a JSON input file.");
+    Console.WriteLine("                    If omitted, the app looks for test-inputs.json.");
+    Console.WriteLine();
+    Console.WriteLine("Options:");
+    Console.WriteLine("  --text            Print text cut list only. This is the default.");
+    Console.WriteLine("  --json            Write JSON output only.");
+    Console.WriteLine("  --both            Print text output and write JSON output.");
+    Console.WriteLine("  --out <file>      Set JSON output file path. Default: cut-list-output.json");
+    Console.WriteLine("  --proof-load      Print loaded connection/flex proof data only.");
+    Console.WriteLine("  -h, --help        Show this help text.");
+    Console.WriteLine();
+    Console.WriteLine("Examples:");
+    Console.WriteLine("  dotnet run");
+    Console.WriteLine("  dotnet run -- --json");
+    Console.WriteLine("  dotnet run -- --both");
+    Console.WriteLine("  dotnet run -- test-inputs.json --json --out cut-list-output.json");
+}
+
+
 
 public sealed class TestInputData
 {
