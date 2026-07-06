@@ -102,14 +102,31 @@ public class FlexConnectorGenerator
         };
     }
 
-    private string GetLayoutText(FlexConnector flexConnector, bool reversed = false)
+   private string GetLayoutText(FlexConnector flexConnector, bool reversed = false)
     {
-        int n = flexConnector.PieceCount switch
+        return flexConnector.Shape switch
         {
-          FlexPieceCount.OnePiece => 5,
-          FlexPieceCount.TwoPiece => 3,
-          FlexPieceCount.FourPiece => 2,  
-          _ => throw new ArgumentOutOfRangeException(nameof(flexConnector.PieceCount), flexConnector.PieceCount, "Unsupported flex piece count.")
+            ConnectorShape.Rectangular => GetRectangularLayoutText(flexConnector, reversed),
+            ConnectorShape.Round => GetRoundLayoutText(flexConnector, reversed),
+
+            _ => throw new ArgumentOutOfRangeException(
+                nameof(flexConnector.Shape),
+                flexConnector.Shape,
+                "Unsupported connector shape."
+            )
+        };
+
+            
+    }
+
+    private string GetRectangularLayoutText(FlexConnector flexConnector, bool reversed = false)
+    {
+            int n = flexConnector.PieceCount switch
+        {
+            FlexPieceCount.OnePiece => 5,
+            FlexPieceCount.TwoPiece => 3,
+            FlexPieceCount.FourPiece => 2,  
+            _ => throw new ArgumentOutOfRangeException(nameof(flexConnector.PieceCount), flexConnector.PieceCount, "Unsupported flex piece count.")
         };
         decimal[] layoutLengths = new decimal[n];
 
@@ -151,7 +168,16 @@ public class FlexConnectorGenerator
                 $"{MathJC.RoundToSixteenth(flexConnector.DimA + prefs.CanvasAddPerSide)}\"] " +
                 $"& [{MathJC.RoundToSixteenth(prefs.CanvasAddPerSide)}\" - " +
                 $"{MathJC.RoundToSixteenth(flexConnector.DimB + prefs.CanvasAddPerSide)}\"]";
-        }        
+        }
+    }
+    private string GetRoundLayoutText(FlexConnector flexConnector, bool reversed = false)
+    {
+        decimal cutLength = GetRoundFlexCutPieces(flexConnector)[0].Length;
+
+        string layoutText = $"[{MathJC.RoundToSixteenth(prefs.CanvasAddPerSide)}\" - " +
+            $"{MathJC.RoundToSixteenth(cutLength - prefs.CanvasAddPerSide)}\"]";
+
+        return layoutText;
     }
 
     private string GetConnectionText(Connection connection)
@@ -330,20 +356,10 @@ public class FlexConnectorGenerator
     }
 
     private List<FlexCutPiece> GetRoundFlexCutPieces(FlexConnector flexConnector)
-    {
-        // Put your round flex cut length math here.
-        // For round flex:
-        // DimA = connection A diameter.
-        // DimB = connection B diameter.
-        // Same-size round flex has DimA == DimB.
-        // Different-size round flex can have DimA != DimB.
-        //
-        // Set "length" to whatever the canvas cut length should be.
-
+    {        
         decimal length = 0m;
         decimal diameter = (flexConnector.DimB > flexConnector.DimA) ? flexConnector.DimB : flexConnector.DimA;
         bool smallEnd = flexConnector.ConnectionA.SmallEnd && flexConnector.ConnectionB.SmallEnd;
-
 
         length = MathJC.RoundStretchOut(diameter, smallEnd);
         length += 2 * prefs.CanvasAddPerSide;
