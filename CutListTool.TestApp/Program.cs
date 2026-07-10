@@ -29,8 +29,6 @@ OutputMode outputMode = GetOutputMode(args);
 string jsonOutputPath = GetJsonOutputPath(args);
 
 //Initialization
-UserPreferences prefs = new();
-
 List<BuildListLine> buildLines = [];
 List<LinearCutItem> rawLinearCuts = [];
 List<CountCutItem> rawCountCuts = [];
@@ -47,7 +45,10 @@ jsonOptions.Converters.Add(new JsonStringEnumConverter());
 string inputPath = GetInputPath(args);
 string json = File.ReadAllText(inputPath);
 
-TestInputData input = JsonSerializer.Deserialize<TestInputData>(json, jsonOptions) ?? throw new InvalidOperationException($"Could not read test input data from {inputPath}.");
+CutListInputData input = JsonSerializer.Deserialize<CutListInputData>(json, jsonOptions)
+    ?? throw new InvalidOperationException($"Could not read cut list input data from {inputPath}.");
+
+UserPreferences prefs = input.Preferences;
 
 DuctmateGenerator dmGenerator = new(prefs);
 LinerGenerator linerGenerator = new(prefs);
@@ -161,7 +162,7 @@ static string GetInputPath(string[] args)
     );
 }
 
-static void PrintProofLoad(TestInputData input)
+static void PrintProofLoad(CutListInputData input)
 {
     Dictionary<string, ConnectionType> connectionTypesByKey = input.ConnectionTypes
         .ToDictionary(
@@ -409,17 +410,5 @@ static void PrintHelp()
     Console.WriteLine("  dotnet run -- --json");
     Console.WriteLine("  dotnet run -- --both");
     Console.WriteLine("  dotnet run -- test-inputs.json --json --out cut-list-output.json");
-}
-
-
-
-public sealed class TestInputData
-{
-    public List<DuctmateFrame> DuctmateFrames { get; init; } = new();
-    public List<Liner> Liners { get; init; } = new();
-    public List<TurnVane> TurnVanes { get; init; } = new();
-
-    public List<ConnectionType> ConnectionTypes { get; init; } = new();
-    public List<FlexConnector> FlexConnectors { get; init; } = new();
 }
 
