@@ -12,7 +12,6 @@
 *.user
 *.userosscache
 *.sln.docstates
-cut-list-output.json
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
