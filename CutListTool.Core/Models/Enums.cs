@@ -109,3 +109,10 @@ public enum OutputMode
     Json,
     Both
 }
+
+public enum CutListOutputFormat
+{
+    Structured,
+    Text,
+    Json
+}
