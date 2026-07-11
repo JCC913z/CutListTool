@@ -1,9 +1,6 @@
-﻿using CutListTool.Core.Generators;
-using CutListTool.Core.Models;
+﻿using CutListTool.Core.Models;
 using CutListTool.Core.Models.OutsideDataHandlers;
 using CutListTool.Core.Services;
-using CutListTool.Core.Services.Outputs;
-using CutListTool.Core.Settings;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -28,11 +25,8 @@ bool proofLoadOnly = HasArgument(args, "--proof-load");
 OutputMode outputMode = GetOutputMode(args);
 string jsonOutputPath = GetJsonOutputPath(args);
 
-//Initialization
-List<BuildListLine> buildLines = [];
-List<LinearCutItem> rawLinearCuts = [];
-List<CountCutItem> rawCountCuts = [];
 
+//Initialization
 JsonSerializerOptions jsonOptions = new()
 {
     PropertyNameCaseInsensitive = true,
@@ -48,87 +42,73 @@ string json = File.ReadAllText(inputPath);
 CutListInputData input = JsonSerializer.Deserialize<CutListInputData>(json, jsonOptions)
     ?? throw new InvalidOperationException($"Could not read cut list input data from {inputPath}.");
 
-UserPreferences prefs = input.Preferences;
-
-DuctmateGenerator dmGenerator = new(prefs);
-LinerGenerator linerGenerator = new(prefs);
-TurnVaneGenerator turnVaneGenerator = new(prefs);
-FlexConnectorGenerator flexConnectorGenerator = new(input.ConnectionTypes, prefs);
-
 if (proofLoadOnly)
 {
     PrintProofLoad(input);
     return;
 }
 
-//Gather and Sort Data
-foreach (DuctmateFrame dmFrame in input.DuctmateFrames)
-{
-    GeneratedBuildOutput output = dmGenerator.Generate(dmFrame);
+CutListRequest request = BuildCutListRequest(outputMode);
 
-    buildLines.Add(output.BuildLine);
-    rawLinearCuts.AddRange(output.LinearCuts);
-    rawCountCuts.AddRange(output.CountCuts);
-}
-
-foreach (Liner liner in input.Liners)
-{
-    GeneratedBuildOutput output = linerGenerator.Generate(liner);
-
-    buildLines.Add(output.BuildLine);
-    rawLinearCuts.AddRange(output.LinearCuts);
-    rawCountCuts.AddRange(output.CountCuts);
-}
-
-foreach (TurnVane turnVane in input.TurnVanes)
-{
-    GeneratedBuildOutput output = turnVaneGenerator.Generate(turnVane);
-
-    buildLines.Add(output.BuildLine);
-    rawLinearCuts.AddRange(output.LinearCuts);
-    rawCountCuts.AddRange(output.CountCuts);
-}
-
-foreach (FlexConnector flexConnector in input.FlexConnectors)
-{
-    GeneratedBuildOutput output = flexConnectorGenerator.Generate(flexConnector);
-
-    buildLines.Add(output.BuildLine);
-    rawLinearCuts.AddRange(output.LinearCuts);
-    rawCountCuts.AddRange(output.CountCuts);
-}
-
-List<LinearCutItem> groupedLinearCuts = CutListGrouper.GroupLinearCuts(rawLinearCuts);
-List<CountCutItem> groupedCountCuts = CutListGrouper.GroupCountCuts(rawCountCuts);
-CutListOutputData cutListOutputData = CutListOutputBuilder.Build(
-    buildLines,
-    groupedLinearCuts,
-    groupedCountCuts
-);
-
-
+CutListResult result = CutListEngine.Generate(input, request);
 
 //Output Processes
-if (outputMode == OutputMode.Text || outputMode == OutputMode.Both)
+foreach (CutListPackage package in result.Packages)
 {
-    TextCutListOutputService textOutputService = new();
+    if (package.OutputFormat == CutListOutputFormat.Text)
+    {
+        Console.Write(package.RenderedOutput);
+    }
+    else if (package.OutputFormat == CutListOutputFormat.Json)
+    {
+        File.WriteAllText(jsonOutputPath, package.RenderedOutput);
 
-    string textOutput = textOutputService.Generate(cutListOutputData);
-
-    Console.Write(textOutput);
+        Console.WriteLine($"JSON output written to: {jsonOutputPath}");
+    }
 }
 
-if (outputMode == OutputMode.Json || outputMode == OutputMode.Both)
+static CutListRequest BuildCutListRequest(OutputMode outputMode)
 {
-    JsonCutListOutputService jsonOutputService = new();
+    List<BuildItemType> allBuildTypes = Enum.GetValues<BuildItemType>().ToList();
 
-    string jsonOutput = jsonOutputService.Generate(cutListOutputData);
+    if (outputMode == OutputMode.Both)
+    {
+        return new CutListRequest(
+            Packages:
+            [
+                new CutListPackageRequest(
+                    Name: "All Cut Lists - Text",
+                    IncludedBuildTypes: allBuildTypes,
+                    OutputFormat: CutListOutputFormat.Text
+                ),
 
-    File.WriteAllText(jsonOutputPath, jsonOutput);
+                new CutListPackageRequest(
+                    Name: "All Cut Lists - Json",
+                    IncludedBuildTypes: allBuildTypes,
+                    OutputFormat: CutListOutputFormat.Json
+                )
+            ]
+        );
+    }
 
-    Console.WriteLine($"JSON output written to: {jsonOutputPath}");
+    CutListOutputFormat outputFormat = outputMode switch
+    {
+        OutputMode.Text => CutListOutputFormat.Text,
+        OutputMode.Json => CutListOutputFormat.Json,
+        _ => throw new ArgumentOutOfRangeException(nameof(outputMode), outputMode, null)
+    };
+
+    return new CutListRequest(
+        Packages:
+        [
+            new CutListPackageRequest(
+                Name: "All Cut Lists",
+                IncludedBuildTypes: allBuildTypes,
+                OutputFormat: outputFormat
+            )
+        ]
+    );
 }
-
 
 static string GetInputPath(string[] args)
 {
