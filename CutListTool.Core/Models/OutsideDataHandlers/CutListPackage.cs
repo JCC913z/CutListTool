@@ -1,5 +1,3 @@
-using CutListTool.Core.Models.OutsideDataHandlers;
-
 namespace CutListTool.Core.Models.OutsideDataHandlers;
 
 public sealed record CutListPackage(
