@@ -1,4 +1,4 @@
-namespace CutListTool.Core.Models;
+namespace CutListTool.Core.Models.OutsideDataHandlers;
 
 public sealed record CutListPackageRequest(
     string Name,

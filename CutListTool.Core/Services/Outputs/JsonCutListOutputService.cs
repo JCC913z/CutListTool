@@ -1,6 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using CutListTool.Core.Models.Outputs;
+using CutListTool.Core.Models.OutsideDataHandlers;
 
 namespace CutListTool.Core.Services.Outputs;
 

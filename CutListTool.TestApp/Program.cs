@@ -1,6 +1,6 @@
 ﻿using CutListTool.Core.Generators;
 using CutListTool.Core.Models;
-using CutListTool.Core.Models.Outputs;
+using CutListTool.Core.Models.OutsideDataHandlers;
 using CutListTool.Core.Services;
 using CutListTool.Core.Services.Outputs;
 using CutListTool.Core.Settings;

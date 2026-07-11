@@ -1,4 +1,4 @@
-namespace CutListTool.Core.Models.Outputs;
+namespace CutListTool.Core.Models.OutsideDataHandlers;
 
 public sealed record CutListOutputData(
     List<CutListBuildSection> Sections

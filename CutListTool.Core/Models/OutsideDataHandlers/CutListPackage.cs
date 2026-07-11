@@ -1,6 +1,6 @@
-using CutListTool.Core.Models.Outputs;
+using CutListTool.Core.Models.OutsideDataHandlers;
 
-namespace CutListTool.Core.Models;
+namespace CutListTool.Core.Models.OutsideDataHandlers;
 
 public sealed record CutListPackage(
     string Name,

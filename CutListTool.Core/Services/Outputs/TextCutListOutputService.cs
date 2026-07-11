@@ -1,6 +1,6 @@
 using System.Text;
 using CutListTool.Core.Models;
-using CutListTool.Core.Models.Outputs;
+using CutListTool.Core.Models.OutsideDataHandlers;
 
 namespace CutListTool.Core.Services.Outputs;
 

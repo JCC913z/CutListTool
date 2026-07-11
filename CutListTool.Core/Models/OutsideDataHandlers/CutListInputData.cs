@@ -1,6 +1,6 @@
 using CutListTool.Core.Settings;
 
-namespace CutListTool.Core.Models;
+namespace CutListTool.Core.Models.OutsideDataHandlers;
 
 public sealed record CutListInputData
 {
