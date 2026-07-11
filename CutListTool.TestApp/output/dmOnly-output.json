@@ -1,0 +1,66 @@
+{
+  "sections": [
+    {
+      "buildType": "Ductmate",
+      "buildLines": [
+        {
+          "buildType": "Ductmate",
+          "text": "1x) 36\u0022 x 12\u0022 - Test-1"
+        },
+        {
+          "buildType": "Ductmate",
+          "text": "1x) 36\u0022 x 24\u0022 - Test-2"
+        },
+        {
+          "buildType": "Ductmate",
+          "text": "3x) 48\u0022 x 12\u0022 - Test-3"
+        }
+      ],
+      "cutSections": [
+        {
+          "cutType": "Ductmate",
+          "groups": [
+            {
+              "groupLabel": null,
+              "linearCuts": [
+                {
+                  "length": 46.75,
+                  "qty": 6,
+                  "buildType": "Ductmate",
+                  "cutType": "Ductmate",
+                  "displayInSixteenths": true,
+                  "groupLabel": null
+                },
+                {
+                  "length": 34.75,
+                  "qty": 4,
+                  "buildType": "Ductmate",
+                  "cutType": "Ductmate",
+                  "displayInSixteenths": true,
+                  "groupLabel": null
+                },
+                {
+                  "length": 22.75,
+                  "qty": 2,
+                  "buildType": "Ductmate",
+                  "cutType": "Ductmate",
+                  "displayInSixteenths": true,
+                  "groupLabel": null
+                },
+                {
+                  "length": 10.75,
+                  "qty": 8,
+                  "buildType": "Ductmate",
+                  "cutType": "Ductmate",
+                  "displayInSixteenths": true,
+                  "groupLabel": null
+                }
+              ],
+              "countCuts": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

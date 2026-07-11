@@ -1,0 +1,32 @@
+{
+  "preferences": {},
+
+  "ductmateFrames": [
+    {
+        "width": 36,
+        "height": 12,
+        "qty": 1,
+        "label" : "Test-1"
+    },
+    {
+        "width": 36,
+        "height": 24,
+        "qty": 1,
+        "label" : "Test-2"
+    },
+    {
+        "width": 48,
+        "height": 12,
+        "qty": 3,
+        "label" : "Test-3"
+    }
+  ],
+
+  "liners": [],
+
+  "turnVanes": [],
+
+  "flexConnectors": [],
+
+  "connectionTypes": []
+}

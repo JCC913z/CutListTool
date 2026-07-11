@@ -47,10 +47,6 @@ CutListResult result = CutListEngine.Generate(input, request);
 //Output Processes
 foreach (CutListPackage package in result.Packages)
 {
-    Console.WriteLine();
-    Console.WriteLine($"===== {package.Name} =====");
-    Console.WriteLine();
-
     if (package.OutputFormat == CutListOutputFormat.Text)
     {
         Console.Write(package.RenderedOutput);
@@ -108,14 +104,30 @@ static CutListRequest BuildCutListRequest(OutputMode outputMode)
 
 static string GetInputPath(string[] args)
 {
-    if (args.Length > 0 && File.Exists(args[0]))
+    string? suppliedInputPath = args
+        .FirstOrDefault(arg => !arg.StartsWith('-') && File.Exists(arg));
+
+    if (suppliedInputPath is not null)
     {
-        return args[0];
+        return suppliedInputPath;
+    }
+
+    string testAppRelativePath = Path.Combine(
+        Directory.GetCurrentDirectory(),
+        "CutListTool.TestApp",
+        "TestInputs",
+        "basic-all.json"
+    );
+
+    if (File.Exists(testAppRelativePath))
+    {
+        return testAppRelativePath;
     }
 
     string currentDirectoryPath = Path.Combine(
         Directory.GetCurrentDirectory(),
-        "test-inputs.json"
+        "TestInputs",
+        "basic-all.json"
     );
 
     if (File.Exists(currentDirectoryPath))
@@ -125,7 +137,8 @@ static string GetInputPath(string[] args)
 
     string outputDirectoryPath = Path.Combine(
         AppContext.BaseDirectory,
-        "test-inputs.json"
+        "TestInputs",
+        "basic-all.json"
     );
 
     if (File.Exists(outputDirectoryPath))
@@ -134,7 +147,7 @@ static string GetInputPath(string[] args)
     }
 
     throw new FileNotFoundException(
-        "Could not find test-inputs.json. Put it in the TestApp project folder, repo root, or pass the path as a command argument."
+        "Could not find a test input file. Default expected path: CutListTool.TestApp/TestInputs/basic-all.json. You can also pass a specific input file path as a command argument."
     );
 }
 
