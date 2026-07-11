@@ -5,5 +5,6 @@ public sealed record CutListPackage(
     List<BuildItemType> IncludedBuildTypes,
     CutListOutputFormat OutputFormat,
     CutListOutputData OutputData,
-    string? RenderedOutput = null
+    string? RenderedOutput = null,
+    string? OutputFileName = null
 );

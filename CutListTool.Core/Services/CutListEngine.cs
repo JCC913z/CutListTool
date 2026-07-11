@@ -110,7 +110,8 @@ public static class CutListEngine
             IncludedBuildTypes: includedBuildTypes,
             OutputFormat: packageRequest.OutputFormat,
             OutputData: outputData,
-            RenderedOutput: renderedOutput
+            RenderedOutput: renderedOutput,
+            OutputFileName: packageRequest.OutputFileName
         );
     }
 
