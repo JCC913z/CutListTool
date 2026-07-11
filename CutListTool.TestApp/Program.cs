@@ -21,7 +21,6 @@ if (HasArgument(args, "--help") || HasArgument(args, "-h"))
     return;
 }
 
-bool proofLoadOnly = HasArgument(args, "--proof-load");
 OutputMode outputMode = GetOutputMode(args);
 string jsonOutputPath = GetJsonOutputPath(args);
 
@@ -39,14 +38,7 @@ jsonOptions.Converters.Add(new JsonStringEnumConverter());
 string inputPath = GetInputPath(args);
 string json = File.ReadAllText(inputPath);
 
-CutListInputData input = JsonSerializer.Deserialize<CutListInputData>(json, jsonOptions)
-    ?? throw new InvalidOperationException($"Could not read cut list input data from {inputPath}.");
-
-if (proofLoadOnly)
-{
-    PrintProofLoad(input);
-    return;
-}
+CutListInputData input = JsonSerializer.Deserialize<CutListInputData>(json, jsonOptions) ?? throw new InvalidOperationException($"Could not read cut list input data from {inputPath}.");
 
 CutListRequest request = BuildCutListRequest(outputMode);
 
@@ -55,6 +47,10 @@ CutListResult result = CutListEngine.Generate(input, request);
 //Output Processes
 foreach (CutListPackage package in result.Packages)
 {
+    Console.WriteLine();
+    Console.WriteLine($"===== {package.Name} =====");
+    Console.WriteLine();
+
     if (package.OutputFormat == CutListOutputFormat.Text)
     {
         Console.Write(package.RenderedOutput);
@@ -83,7 +79,7 @@ static CutListRequest BuildCutListRequest(OutputMode outputMode)
                 ),
 
                 new CutListPackageRequest(
-                    Name: "All Cut Lists - Json",
+                    Name: "All Cut Lists - JSON",
                     IncludedBuildTypes: allBuildTypes,
                     OutputFormat: CutListOutputFormat.Json
                 )
@@ -140,170 +136,6 @@ static string GetInputPath(string[] args)
     throw new FileNotFoundException(
         "Could not find test-inputs.json. Put it in the TestApp project folder, repo root, or pass the path as a command argument."
     );
-}
-
-static void PrintProofLoad(CutListInputData input)
-{
-    Dictionary<string, ConnectionType> connectionTypesByKey = input.ConnectionTypes
-        .ToDictionary(
-            connectionType => connectionType.Key,
-            StringComparer.OrdinalIgnoreCase
-        );
-
-    Console.WriteLine("Loaded Connection Types");
-    Console.WriteLine("============================");
-    foreach (ConnectionType connectionType in input.ConnectionTypes)
-    {
-        string flangeNote = connectionType.UsesFlangeOptions
-            ? " - uses flange options"
-            : "";
-
-        Console.WriteLine(
-            $"{connectionType.Key} = {connectionType.DisplayName}{flangeNote}"
-        );
-    }
-
-    Console.WriteLine();
-    Console.WriteLine("Loaded Flex Connectors");
-    Console.WriteLine("======================");
-
-    foreach (FlexConnector flexConnector in input.FlexConnectors)
-    {
-        string connectionAText = GetConnectionText(
-            flexConnector.ConnectionA,
-            connectionTypesByKey
-        );
-
-        string connectionBText = GetConnectionText(
-            flexConnector.ConnectionB,
-            connectionTypesByKey
-        );
-
-        Console.WriteLine();
-        Console.WriteLine(
-            $"{flexConnector.Label} - {flexConnector.DimA}\" x {flexConnector.DimB}\" ({flexConnector.Qty}x)"
-        );
-
-        Console.WriteLine($"  {connectionAText} -> {connectionBText}");
-
-        PrintConnectionSideDetails(
-            "Connection A",
-            flexConnector.ConnectionA,
-            connectionTypesByKey
-        );
-
-        PrintConnectionSideDetails(
-            "Connection B",
-            flexConnector.ConnectionB,
-            connectionTypesByKey
-        );
-    }
-}
-
-static string GetConnectionText(
-    Connection connection,
-    Dictionary<string, ConnectionType> connectionTypesByKey
-)
-{
-    if (!connectionTypesByKey.TryGetValue(
-        connection.ConnectionTypeKey,
-        out ConnectionType? connectionType
-    ))
-    {
-        return $"UNKNOWN CONNECTION TYPE: {connection.ConnectionTypeKey}";
-    }
-    else if (connection.SideConnections is not null && connection.SideConnections.Count > 0)
-    {
-        return $"Custom {connectionType.DisplayName}";
-    }
-    else if (connectionType.UsesFlangeOptions)
-    {
-        return GetFlangeText(
-            connection.FlangeDirection,
-            connection.FlangeSize
-        );
-    }
-    else
-    {
-        return connectionType.DisplayName;
-    }
-}
-
-static void PrintConnectionSideDetails(
-    string connectionName,
-    Connection connection,
-    Dictionary<string, ConnectionType> connectionTypesByKey
-)
-{
-    List<PerSideConnection> sideConnections =
-        connection.SideConnections ?? new List<PerSideConnection>();
-
-    if (sideConnections.Count == 0)
-    {
-        return;
-    }
-
-    Console.WriteLine($"  {connectionName} side details:");
-
-    foreach (PerSideConnection sideConnection in sideConnections)
-    {
-        string sideText = GetSideConnectionText(
-            sideConnection,
-            connectionTypesByKey
-        );
-
-        Console.WriteLine($"    {sideConnection.Side}: {sideText}");
-    }
-}
-
-static string GetSideConnectionText(
-    PerSideConnection sideConnection,
-    Dictionary<string, ConnectionType> connectionTypesByKey
-)
-{
-    if (!connectionTypesByKey.TryGetValue(
-        sideConnection.ConnectionTypeKey,
-        out ConnectionType? connectionType
-    ))
-    {
-        return $"UNKNOWN CONNECTION TYPE: {sideConnection.ConnectionTypeKey}";
-    }
-    else if (connectionType.UsesFlangeOptions)
-    {
-        return GetFlangeText(
-            sideConnection.FlangeDirection,
-            sideConnection.FlangeSize
-        );
-    }
-    else
-    {
-        return connectionType.DisplayName;
-    }
-}
-
-static string GetFlangeText(
-    FlangeDirection? flangeDirection,
-    decimal? flangeSize
-)
-{
-    if (flangeDirection is null)
-    {
-        return "MISSING FLANGE DIRECTION";
-    }
-    else if (flangeDirection == FlangeDirection.Straight)
-    {
-        return "Straight";
-    }
-    else if (flangeSize is null)
-    {
-        return $"F{flangeDirection.Value.ToString()[0]} - MISSING FLANGE SIZE";
-    }
-    else
-    {
-        string flangeSizeText = flangeSize.Value.ToString("0.###");
-
-        return $"{flangeSizeText}\" F{flangeDirection.Value.ToString()[0]}";
-    }
 }
 
 static bool HasArgument(string[] args, string argumentName)
@@ -382,7 +214,6 @@ static void PrintHelp()
     Console.WriteLine("  --json            Write JSON output only.");
     Console.WriteLine("  --both            Print text output and write JSON output.");
     Console.WriteLine("  --out <file>      Set JSON output file path. Default: cut-list-output.json");
-    Console.WriteLine("  --proof-load      Print loaded connection/flex proof data only.");
     Console.WriteLine("  -h, --help        Show this help text.");
     Console.WriteLine();
     Console.WriteLine("Examples:");
