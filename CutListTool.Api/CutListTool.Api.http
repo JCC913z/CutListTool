@@ -1,6 +1,93 @@
+# CutListTool API development requests
+#
+# Full input field and enum reference:
+# ../CutListTool.TestApp/TestInputs/CutListTool_Input_Guide.md
+#
+# Start the API with:
+# dotnet run --project CutListTool.Api --launch-profile http
+
 @CutListTool.Api_HostAddress = http://localhost:5072
 
-GET {{CutListTool.Api_HostAddress}}/weatherforecast/
+
+### Get the generated OpenAPI description
+
+GET {{CutListTool.Api_HostAddress}}/openapi/v1.json
 Accept: application/json
 
-###
+
+### Generate a structured ductmate cut list
+#
+# Structured output is the format the PHP website will primarily use.
+# It returns sections, build lines, cut groups, and individual cut items.
+
+POST {{CutListTool.Api_HostAddress}}/api/cutlists/generate
+Content-Type: application/json
+Accept: application/json
+
+{
+  "input": {
+    "preferences": {},
+    "ductmateFrames": [
+      {
+        "width": 24,
+        "height": 12,
+        "qty": 1,
+        "label": "AHU-1"
+      }
+    ],
+    "liners": [],
+    "turnVanes": [],
+    "flexConnectors": [],
+    "connectionTypes": []
+  },
+  "request": {
+    "packages": [
+      {
+        "name": "Structured Ductmate Test",
+        "includedBuildTypes": [
+          "Ductmate"
+        ],
+        "outputFormat": "Structured"
+      }
+    ]
+  }
+}
+
+
+### Generate a plain-text ductmate cut list
+#
+# Text output is useful for console output, copying, previews,
+# and possible downloadable text files.
+
+POST {{CutListTool.Api_HostAddress}}/api/cutlists/generate
+Content-Type: application/json
+Accept: application/json
+
+{
+  "input": {
+    "preferences": {},
+    "ductmateFrames": [
+      {
+        "width": 24,
+        "height": 12,
+        "qty": 1,
+        "label": "AHU-1"
+      }
+    ],
+    "liners": [],
+    "turnVanes": [],
+    "flexConnectors": [],
+    "connectionTypes": []
+  },
+  "request": {
+    "packages": [
+      {
+        "name": "Text Ductmate Test",
+        "includedBuildTypes": [
+          "Ductmate"
+        ],
+        "outputFormat": "Text"
+      }
+    ]
+  }
+}
